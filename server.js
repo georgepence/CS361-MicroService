@@ -27,7 +27,9 @@ app.get('/imageSearch', ((req, res) => {
 }))
 
 app.get('*', ((req, res) => {
-  res.send('Message from CS361')
+  let message = "Message from CS361"
+  message = JSON.stringify(message)
+  res.send(message)
 }));
 
 app.listen(port, ()=> console.log(`server started on port ${port}.`));
