@@ -22,7 +22,7 @@ app.get('/imageSearch', ((req, res) => {
     })
     
     req.on('error', err => console.error(err))
-   req.end()
+   req.send("Wow!")
   
 }))
 
