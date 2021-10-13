@@ -12,6 +12,10 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
+app.get('/getImage'), ((req, res) => {
+
+})
+
 app.get('/imageSearch', ((req, res) => {
   
     const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
@@ -22,7 +26,7 @@ app.get('/imageSearch', ((req, res) => {
     })
     
     req.on('error', err => console.error(err))
-   req.send("Wow!")
+   res.send("Wow!")
   
 }))
 
