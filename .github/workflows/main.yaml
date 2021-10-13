@@ -38,7 +38,7 @@ jobs:
             cd CS361-MicroService
             git pull
             forever stop 361MS
-            forever start server.js
+            forever -a --uid 361MS start server.js
             forever list
           host: ${{ secrets.FLIP_HOST }}
           username: penceg
