@@ -1,5 +1,6 @@
 const fsProm = require('fs/promises');
 const fs = require('fs');
+require('dotenv').config();
 
 async function randomFile() {
   
@@ -10,7 +11,7 @@ async function randomFile() {
     let num = Math.floor(Math.random() * numFiles) + 1
  
     // return link to random image file
-    return 'http://localhost:5000/image?image=' + num + '.jpeg'
+    return `http://localhost:${process.env.PORT}/image?image=` + num + '.jpeg'
   }
   
   catch (err) {return err}
