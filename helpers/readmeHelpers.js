@@ -1,5 +1,6 @@
 const fsProm = require('fs/promises');
 const fs = require('fs');
+const path = require('path')
 require('dotenv').config();
 
 async function randomFile() {
@@ -7,7 +8,9 @@ async function randomFile() {
   try {
     console.log("About to start")
     console.log("Root = ", __dirname)
-    const files = await fsProm.readdir('./images/client/random/small')
+    let imagePath = path.resolve(__dirname, '../images/client/random/small')
+    console.log("path = ", imagePath)
+    const files = await fsProm.readdir(imagePath)
     console.log("files = ", files)
     
     let numFiles = files.length
