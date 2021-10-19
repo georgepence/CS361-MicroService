@@ -6,6 +6,7 @@ async function randomFile() {
   console.log("before try statement")
   try {
     console.log("About to start")
+    console.log("Root = ", __dirname)
     const files = await fsProm.readdir('./images/client/random/small')
     console.log("files = ", files)
     
