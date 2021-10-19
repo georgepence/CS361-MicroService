@@ -15,6 +15,8 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
+console.log("At the top")
+
 app.get('/getImage', ((req, res) => {
   
   async function fetchRandom(req) {
@@ -45,6 +47,7 @@ app.get('/getImage', ((req, res) => {
     
     }
   }
+  console.log("Starting")
   fetchRandom(req).finally(() =>{})
 
 }))
