@@ -1,19 +1,20 @@
 const express = require('express');
-const cors = require('cors');
-const https = require('https');
-const http = require('http');
-require('dotenv').config();
-const bodyParser = require('body-parser');
-const helpers = require('./helpers/readmeHelpers')
-const port = process.env.PORT || 5000;
-const path = require('path');
+// const cors = require('cors');
+// const https = require('https');
+// const http = require('http');
+// require('dotenv').config();
+// const bodyParser = require('body-parser');
+// const helpers = require('./helpers/readmeHelpers')
+// const port = process.env.PORT || 5000;
+// const path = require('path');
 
+const port = 17775
 const app = express();
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: false}));
-app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false}));
+// app.use(bodyParser.json());
 
 // console.log("At the top")
 //
@@ -119,7 +120,7 @@ app.use(bodyParser.json());
 //   res.sendFile(__dirname + '/images/client/random/small/' + image)
 // })
 
-app.get('*', ((req, res) => {
+app.get('/', ((req, res) => {
   let message = "Message from CS361"
   message = JSON.stringify(message)
   res.send(message)
