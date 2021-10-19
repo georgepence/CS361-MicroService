@@ -1,0 +1,40 @@
+#row1 {
+  border-bottom-width: medium;
+}
+
+td, th {
+  padding: 0.5em 1.5em 0.5em 0.5em;
+}
+
+.none {
+  text-align: center;
+}
+
+h2 {
+  color: cornflowerblue;
+  margin-top: 1em;
+}
+
+h3 {
+  color: midnightblue;
+  margin-top: 2em;
+}
+
+.fetch-image {
+  height: 265px;
+  text-align: center;
+  position: relative;
+}
+
+.placeholder-text {
+  position: relative;
+  top: 45%;
+}
+
+.random-image {
+  width: 100%;
+}
+
+ol li {
+  font-size: small;
+}

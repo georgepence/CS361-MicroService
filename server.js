@@ -1,9 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const https = require('https');
+const http = require('http');
 require('dotenv').config();
 const bodyParser = require('body-parser');
+const helpers = require('./helpers/readmeHelpers')
 const port = process.env.PORT || 5000;
+const path = require('path');
 
 const app = express();
 
@@ -14,23 +17,35 @@ app.use(bodyParser.json());
 
 app.get('/getImage', ((req, res) => {
   
-  const url = 'https://web.engr.oregonstate.edu/~penceg/roscoe-memorial/images/gate.shower?width=450';
-  console.log("Req send = ", req.query.send)
-  
-  if (!req.query.send || req.query.send === "link") {
-    // URL of the image
-    res.send(res.json(url))
-    
-  } else {
-    try {
-      console.log("I'm here now!!!")
-      res.sendFile(`${__dirname}/images/tennis.jpg`)
-      console.log('sent!')
-    } catch (error) {
-      console.error(error);
-    }
+  async function fetchRandom(req) {
 
+    let url = await helpers.randomFile()
+    console.log("Here we go:  url = ", url)
+    if (url.error) {
+      console.log(url.error)
+      res.send(url.error)
+    }
+    
+    console.log("In main server, req.query = ", req.query === true)
+  
+    if (req.query.response_type || req.query.response_type === "link") {
+      // URL of the image
+      res.json(url)
+    
+    } else {
+      try {
+        let fileName = await helpers.randomFileName()
+        console.log("File Name = ", fileName)
+        res.sendFile(`${__dirname}/images/client/random/small/${fileName}`)
+        console.log('sent!')
+  
+      } catch (error) {
+        console.error(error);
+      }
+    
+    }
   }
+  fetchRandom(req).finally(() =>{})
 
 }))
 
@@ -75,6 +90,31 @@ app.get('/imageSearch', ((req, res) => {
    res.send("Wow!")
   
 }))
+
+// +++++++++++=  TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Without middleware
+app.get('/test2', function(req, res){
+  var options = {
+    root: path.join(__dirname, '/images/client/')
+  };
+  
+  var fileName = 'chico.txt';
+  res.sendFile(fileName, options, function (err) {
+    if (err) {
+      next(err);
+    } else {
+      console.log('Sent:', fileName);
+    }
+  });
+});
+
+// +++++++++++=  END TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++
+
+app.get('/image', (req, res) => {
+  let image = req.query.image
+  res.sendFile(__dirname + '/images/client/random/small/' + image)
+})
 
 app.get('*', ((req, res) => {
   let message = "Message from CS361"
