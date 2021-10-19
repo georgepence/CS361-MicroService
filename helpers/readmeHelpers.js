@@ -8,7 +8,7 @@ async function randomFile() {
   try {
     console.log("About to start")
     console.log("Root = ", __dirname)
-    let imagePath = path.resolve(__dirname, '../images/client/random/small')
+    let imagePath = path.resolve('./images/client/random/small')
     console.log("path = ", imagePath)
     const files = await fsProm.readdir(imagePath)
     console.log("files = ", files)
