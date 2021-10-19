@@ -3,9 +3,9 @@ const fs = require('fs');
 require('dotenv').config();
 
 async function randomFile() {
-  
+  console.log("before try statement")
   try {
-    "About to start"
+    console.lot("About to start")
     const files = await fsProm.readdir('./images/client/random/small')
     console.log("files = ", files)
     
