@@ -5,7 +5,9 @@ require('dotenv').config();
 async function randomFile() {
   
   try {
+    "About to start"
     const files = await fsProm.readdir('./images/client/random/small')
+    console.log("files = ", files)
     
     let numFiles = files.length
     let num = Math.floor(Math.random() * numFiles) + 1
