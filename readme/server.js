@@ -9,11 +9,13 @@ const port = process.env.PORT || 6515;
 const serverURL = process.env.SERVER || 'http://localhost:5000'
 const fs = require('fs')
 const axios = require('axios')
+const cors = require('cors');
 
 const app = express();
 app.use(express.static(__dirname + '/node_modules/bootstrap/dist'))
 app.use(express.static(__dirname + '/static'))
 
+app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());

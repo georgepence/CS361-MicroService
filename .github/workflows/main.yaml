@@ -39,6 +39,8 @@ jobs:
             git pull
             forever stop 361MS
             forever -a --uid 361MS start server.js
+            cd readme
+            forever -a --uid READ start server.js
             forever list
           host: ${{ secrets.FLIP_HOST }}
           username: penceg

@@ -1,8 +1,8 @@
 
 async function insertImage(cardId, buttonId) {
-  // let serverData = await(fetch('http://localhost:6515/getServer'))
-  // let serverURL = await serverData.json()
-  
+  let serverData = await(fetch('http://localhost:6515/getServer'));
+  let serverURL = await serverData.json();
+  console.log(serverURL);
 
   let url = 'http://flip3.engr.oregonstate.edu:6515/getImage'
   let url2 ='http://flip3.engr.oregonstate.edu:6515/testRoute'
