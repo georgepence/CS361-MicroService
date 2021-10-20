@@ -38,6 +38,7 @@ jobs:
             cd CS361-MicroService
             git pull
             forever stop 361MS
+            forever stop READ
             forever -a --uid 361MS start server.js
             cd readme
             forever -a --uid READ start server.js

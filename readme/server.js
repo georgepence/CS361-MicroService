@@ -4,11 +4,11 @@ const request = require('request');
 const http = require('http');
 require('dotenv').config();
 const bodyParser = require('body-parser');
-const helpers = require('../helpers/readmeHelpers')
+const helpers = require('../helpers/readmeHelpers');
 const port = process.env.PORT || 6515;
 const serverURL = process.env.SERVER || 'http://localhost:5000'
 const fs = require('fs')
-const axios = require('axios')
+const axios = require('axios');
 const cors = require('cors');
 
 const app = express();
