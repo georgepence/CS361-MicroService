@@ -1,11 +1,21 @@
 
 async function insertImage(cardId, buttonId) {
   console.log("Here in insertImage")
-  try {let serverData = await(fetch('http://localhost:6515/getServer'));}
-  catch {let serverData = await(fetch('http://flip3.engr.oregonstate.edu:6515/getServer'))}
   
-  let serverURL = await serverData.json();
-  console.log(serverURL);
+  async function getServerUrl() {
+    try {
+      let serverData = await(fetch('http://localhost:6515/getServer'));
+      return await serverData.json();
+    }
+    catch {
+      let serverData = await(fetch('http://flip3.engr.oregonstate.edu:6515/getServer'))
+      return await serverData.json();
+    }
+  }
+
+  let serverURL = await getServerUrl()
+  
+  console.log("Got my server", serverURL);
 
   let url = 'http://flip3.engr.oregonstate.edu:6515/getImage'
   let url2 ='http://flip3.engr.oregonstate.edu:6515/testRoute'
