@@ -1,5 +1,6 @@
 
 async function insertImage(cardId, buttonId) {
+  console.log("Here in insertImage")
   let serverData = await(fetch('http://localhost:6515/getServer'));
   let serverURL = await serverData.json();
   console.log(serverURL);
