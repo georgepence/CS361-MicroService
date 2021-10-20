@@ -8,6 +8,7 @@ async function insertImage(cardId, buttonId) {
       return await serverData.json();
     }
     catch {
+      console.log("Well, that didn't work")
       let serverData = await(fetch('http://flip3.engr.oregonstate.edu:6515/getServer'))
       return await serverData.json();
     }
