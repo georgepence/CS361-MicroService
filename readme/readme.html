@@ -16,41 +16,76 @@
   <section>
     
     <h3>What you can do now:</h3>
-    <p>
-      You can issue a GET request to the following link:
+    <h6>
+      1) You can issue a GET request to the following link:
+    </h6>
+    <p class="mycode">
+      http://flip3.engr.oregonstate.edu:17778/getImage?response_type=link
     </p>
     <p>
-      http://flip3.engr.oregonstate.edu:17778/getImage
-    </p>
-    <p>
-      This will return a
-      JSON of a link text. If you insert this link as the 'src' of an 'img' HTML element, the image will
-      be on the rendered page. The image will be chosen randomly from 14
+      The server <span class="myemph2">response</span> to this will be
+      JSON of a <span class="myemph2">link text</span>. If your client app then
+      assigns the
+      <span class="myemph2">link text (the response)</span> as the 'src' of an 'img' HTML
+      the browser will then call for the link, and the server will respond by
+      sending the image file, and the image will
+      rendered on the page.
+      The image will be chosen randomly from 14
       'placeholder' images located on the Image Server.
     </p>
     <p>
-      To see a simple coding example, go to
+      To see this in action, go to this github repository and look at the <a
+      class="myemph" href="https://github.com/georgepence/Image-Server-getLink">
+      github repository here</a>, and look specifically at the script at the
+      bottom, which manipulates the "image-div" div element.
     </p>
+    <h6>
+      2) Alternatively, simply put the following into an image 'src' attribute:
+    </h6>
+    <p class="mycode">
+      http://flip3.engr.oregonstate.edu:17778/getImage?response_type=file
+    </p>
+    <p>
+      The Server will then simply send a random image file in response.
+    <p>
+      To see this in action, go to this github repository and look at the <a
+            class="myemph" href="https://github.com/georgepence/Image-Server-getLink">
+      github repository here</a>, and look specifically at the image element in
+      the 'image-div-2' div element.
+    </p>
+    <p>
+      The Readme to the repository linked above has some more detailed information
+      if you are interested.
+    </p>
+    
     <h3>General notes:</h3>
     <ul>
-      <li>Clients will have an apiKey. This will allow tracking, in order to:
+      <li>My best guess is that each Client will have an apiKey. I am thinking that
+        this will allow tracking, in order to:
         <ol>
           <li>Allow each client to have different 'default' settings, such as image size</li>
-          <li>Ensure fresh images are served, not duplicates of previously served images.</li>
+          <li>Ensure fresh images are served, not duplicates of images previously
+          served to that client (unless a 'reset' is issued, perhaps at the start
+          of a new game or a new contest).</li>
         </ol>
       </li>
-      <li>Clients receive either of two types of responses:
+      <li>Clients will receive either of two types of responses:
         <ol>
-          <li>A link to an image file, which will be on this server, or</li>
+          <li>A <span class="myemph2">link</span> to an image file, which will be on this server, or</li>
           <li>The image file itself</li>
         </ol>
       </li>
     </ul>
   </section>
   <h3>Methods</h3>
-  <p>Clients can use either GET or POST to request images.</p>
+  <p>I am setting everything up as GET requests, but may make it so that you
+    could use POST also.  We'll see...</p>
   
   <h3>Options</h3>
+  <p>
+    Below are my current thoughts regarding what you can request.  None of this
+    is implemented yet, except for "response_type".
+  </p>
   <table class="table table-striped table-bordered">
     <thead>
     <tr id="row1">
@@ -86,18 +121,18 @@
       <td>In Development</td>
     </tr>
     <tr>
-      <th scope="row">responseType</th>
+      <th scope="row">response_type</th>
       <td>Optional</td>
-      <td>link</td>
+      <td>file</td>
       <td>Two possible values: "link" will return json containing a link to the photo; "file" will return a jpeg file
       </td>
-      <td>In Development</td>
+      <td>Deployed</td>
     </tr>
     <tr>
       <th scope="row">searchTerms</th>
       <td>Optional</td>
       <td>random</td>
-      <td>"random" or no value will return a random image or link
+      <td>"random" or no value will return a random image or link.  Search terms will return a Flikr or Google search with the search terms.
       </td>
       <td>In Development</td>
     </tr>
@@ -106,71 +141,68 @@
   </table>
 </div>
 
-<div class="container">
-  <h3>Three ways to display images</h3>
-  <div class="row">
-    <div class="col-sm-4">
-      <div class="card">
-        <div id="chico" class="fetch-image border-bottom">
-          <p class="placeholder-text" style="display: block">I want to be a picture</p>
-          <div id="image-1"></div>
-        </div>
-        <div class="card-body">
-          <h6 class="card-title">Link to image on this server</h6>
-          <ol class="card-text">
-            <li>Client issues GET or POST request</li>
-            <li>Server selects or obtains image</li>
-            <li>Server returns link to image on Server</li>
-            <li>Client inserts link as an &lt;image src=[link] /&gt;</li>
-          </ol>
-          <button id="button-1" class="btn btn-primary">Go somewhere</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-4">
-      <div class="card">
-        <div id="card-2" class="border-bottom">
-
-          <div id="image-2"><img src='/images/client/myfiles/myFetchImage.jpg' class="random-image" alt="random image"/></div>
-        </div>
-        <div class="card-body">
-          <h6 class="card-title">Issue a GET request</h6>
-          <ol class="card-text">
-            <li>Client issues GET or POST request</li>
-            <li>Server selects or obtains image</li>
-            <li>Server returns link to image on Server</li>
-            <li>Client uses link to issue GET request directly on the image file</li>
-            <li>Server returns image file</li>
-            <li>Client saves image to disk, uses image locally</li>
-          </ol>
-          <button id="button-2" class="btn btn-primary">Go somewhere</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-4">
-      <div class="card">
-        <div id="card-3" class="fetch-image border-bottom">
-          <p class="placeholder-text" style="display: block">Oh, please please please</p>
-          <div id="image-3"></div>
-        </div>
-        <div class="card-body">
-          <h6 class="card-title">Server sends image file, not link</h6>
-          <ol class="card-text">
-            <li>Client issues GET or POST request</li>
-            <li>Server selects or obtains image</li>
-            <li>Server returns the image file itself</li>
-            <li>Client saves image to disk, uses image locally</li>
-          </ol>
-          <button id="button-3" class="btn btn-primary">Go somewhere</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<!--<div class="container">-->
+<!--  <h3>Three ways to display images</h3>-->
+<!--  <div class="row">-->
+<!--    <div class="col-sm-6">-->
+<!--      <div class="card">-->
+<!--        <div id="chico" class="fetch-image border-bottom">-->
+<!--          <p class="placeholder-text" style="display: block">click below to get random image</p>-->
+<!--          <div id="image-1"></div>-->
+<!--        </div>-->
+<!--        <div class="card-body">-->
+<!--          <h6 class="card-title">Link to image on this server</h6>-->
+<!--          <ol class="card-text">-->
+<!--            <li>Client issues GET request for "link"</li>-->
+<!--            <li>Server selects or obtains image</li>-->
+<!--            <li>Server returns link to image on Server</li>-->
+<!--            <li>Client inserts link as an &lt;image src=[link] /&gt;</li>-->
+<!--          </ol>-->
+<!--          <button id="button-1" class="btn btn-primary">Click Me</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="col-sm-6">-->
+<!--      <div class="card">-->
+<!--        <div id="card-2" class="fetch-image border-bottom">-->
+<!--          <p class="placeholder-text" style="display: block">click below to get random image</p>-->
+<!--          <div id="image-2"></div>-->
+<!--        </div>-->
+<!--        <div class="card-body">-->
+<!--          <h6 class="card-title">Issue a GET request</h6>-->
+<!--          <ol class="card-text">-->
+<!--            <li>Client issues GET request for "file"</li>-->
+<!--            <li>Server selects or obtains image</li>-->
+<!--            <li>Server returns image file</li>-->
+<!--          </ol>-->
+<!--          <button id="button-2" class="btn btn-primary">Click Me</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="col-sm-6" hidden>-->
+<!--      <div class="card">-->
+<!--        <div id="card-3" class="fetch-image border-bottom">-->
+<!--          <p class="placeholder-text" style="display: block">Oh, please please please</p>-->
+<!--          <div id="image-3"></div>-->
+<!--        </div>-->
+<!--        <div class="card-body">-->
+<!--          <h6 class="card-title">Server sends image file, not link</h6>-->
+<!--          <ol class="card-text">-->
+<!--            <li>Client issues GET or POST request</li>-->
+<!--            <li>Server selects or obtains image</li>-->
+<!--            <li>Server returns the image file itself</li>-->
+<!--            <li>Client saves image to disk, uses image locally</li>-->
+<!--          </ol>-->
+<!--          <button id="button-3" class="btn btn-primary">Go somewhere</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
 
 
 <script src="js/bootstrap.min.js"></script>
-<script src="/readme.js"></script>
+<!--<script src="/readme.js"></script>-->
 
 </body>
 </html>

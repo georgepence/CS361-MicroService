@@ -35,16 +35,20 @@ async function insertImage(cardId, buttonId) {
   let url = serverURL.readme + '/getImage'
   let url2 =serverURL.readme + '/testRoute'
   if (buttonId === 'button-1') url += '?method=link'
-  if (buttonId === 'button-2') url += '?method=get'
+  if (buttonId === 'button-2') url += '?method=file'
   if (buttonId === 'button-3') url = url2
   
-  let result = await fetch(url).catch((err) => console.log(err))
-  // if (buttonId === 'button-1') { let data = await result.json() }
-  // if (buttonId === 'button-2') url += '?method=get'
-  // if (buttonId === 'button-3') { let data = '/images/client/myfiles/myFetchImage.jpg' }
+  if (buttonId === 'button-1') {
+    let result = await fetch(url).catch((err) => console.log(err))
+    // if (buttonId === 'button-1') { let data = await result.json() }
+    // if (buttonId === 'button-2') url += '?method=get'
+    // if (buttonId === 'button-3') { let data = '/images/client/myfiles/myFetchImage.jpg' }
   
-  let data = await result.json();
-  console.log("data data = ", data)
+    let data = await result.json();
+    console.log("data data = ", data)
+    return data
+  }
+
   
   let card = document.getElementById(cardId);
   card.innerHTML = `<img src=${data} class="random-image" alt="random image"/> `;
