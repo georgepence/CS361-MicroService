@@ -5,12 +5,26 @@ async function insertImage(cardId, buttonId) {
   async function getServerUrl() {
     try {
       let serverData = await(fetch('http://localhost:6515/getServer'));
-      return await serverData.json();
+      let mainServer = await serverData.json()
+
+      return { main: mainServer,
+               readme: 'http://localhost:6515'
+      };
     }
     catch {
       console.log("Well, that didn't work")
       let serverData = await(fetch('http://flip3.engr.oregonstate.edu:6515/getServer'))
-      return await serverData.json();
+      let readmeServer = await serverData.json();
+      return { main: mainServer,
+               readme: 'http://flip3.engr.oregonstate.edu:6515'
+    }
+  }}
+  
+  async function getImageSrc() {
+    if (buttonId === 'button-3') {
+      return '/images/client/myfiles/myFetchImage.jpg';
+    } else {
+      return await result.json();
     }
   }
 
@@ -18,8 +32,8 @@ async function insertImage(cardId, buttonId) {
   
   console.log("Got my server", serverURL);
 
-  let url = 'http://flip3.engr.oregonstate.edu:6515/getImage'
-  let url2 ='http://flip3.engr.oregonstate.edu:6515/testRoute'
+  let url = serverURL.readme + '/getImage'
+  let url2 =serverURL.readme + '/testRoute'
   if (buttonId === 'button-1') url += '?method=link'
   if (buttonId === 'button-2') url += '?method=get'
   if (buttonId === 'button-3') url = url2

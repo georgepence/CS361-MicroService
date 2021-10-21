@@ -28,8 +28,14 @@ app.get('/getImage', ((req, res) => {
       res.send(url.error)
     }
 
-    console.log("In main server, req.query = ", req.query === true)
-
+    console.log("In main server, req.query = ", req.query.response_type == true, req.query.response_type)
+    if (req.query.response_type) {console.log(url)}
+    console.log("Req url", req.url)
+    console.log("Req query", req.query)
+    console.log("Req body", req.body)
+    console.log("Req orig url", req.originalUrl)
+    
+    
     if (req.query.response_type || req.query.response_type === "link") {
       // URL of the image
       res.json(url)

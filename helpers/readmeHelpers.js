@@ -15,10 +15,10 @@ async function randomFile() {
     
     let numFiles = files.length
     let num = Math.floor(Math.random() * numFiles) + 1
-    console.log("numfiles = ", num)
+    console.log("numfiles = ", numFiles, "randomNum = ", num)
  
     // return link to random image file
-    console.log(`http://localhost:${process.env.PORT}/image?image=` + num + '.jpeg')
+    console.log(`http://localhost:${process.env.PORT}/image?image=${num}.jpeg`)
     if(process.env.NODE_ENV === 'development') {
       return `http://localhost:${process.env.PORT}/image?image=` + num + '.jpeg'
     } else {

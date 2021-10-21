@@ -34,7 +34,7 @@ app.get('/getImage', (req, res) => {
       return result.data
       
     } else if (req.query.method === 'get') {
-      let result = await axios.get(serverURL + '/getImage?responseType=file')
+      let result = await axios.get(serverURL + '/getImage?response_type=file')
       let imageLink = await result.data;
       console.log("get request = ", serverURL + imageLink)
       let file = await axios.get(serverURL + imageLink);
