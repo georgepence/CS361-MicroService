@@ -36,7 +36,7 @@ app.get('/getImage', ((req, res) => {
     console.log("Req orig url", req.originalUrl)
     
     
-    if (req.query.response_type || req.query.response_type === "link") {
+    if (req.query.response_type === "link") {
       // URL of the image
       res.json(url)
 

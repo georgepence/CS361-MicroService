@@ -27,7 +27,7 @@ app.get('/getServer', (req, res) => {
 
 app.get('/getImage', (req, res) => {
   async function fetchImage (req, res) {
-    let imageLink = '';
+    // let imageLink = '';
     
     if (req.query.method === 'link') {
       let result = await axios.get(serverURL + '/getImage?response_type=link')
