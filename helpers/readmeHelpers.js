@@ -20,9 +20,9 @@ async function randomFile() {
     // return link to random image file
     console.log(`http://localhost:${process.env.PORT}/image?image=${num}.jpeg`)
     if(process.env.NODE_ENV === 'development') {
-      return `http://localhost:${process.env.PORT}/image?image=` + num + '.jpeg'
+      return `http://localhost:${process.env.PORT}/image?image=${num}.jpeg`
     } else {
-      return `http://flip3.engr.oregonstate.edu:${process.env.PORT}/image?image=\` + num + '.jpeg`
+      return `http://flip3.engr.oregonstate.edu:${process.env.PORT}/image?image=${num}.jpeg`
     }
   }
   
