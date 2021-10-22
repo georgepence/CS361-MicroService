@@ -1,7 +1,8 @@
 const express = require('express');
+const request = require('request');
 const cors = require('cors');
 const https = require('https');
-const http = require('http');
+// const http = require('http');      todo
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const helpers = require('./helpers/readmeHelpers')
@@ -28,12 +29,12 @@ app.get('/getImage', ((req, res) => {
       res.send(url.error)
     }
 
-    console.log("In main server, req.query = ", req.query.response_type == true, req.query.response_type)
+    console.log("In main server, req.query = ", req.query.response_type == true, req.query.response_type)   // todo
     if (req.query.response_type) {console.log(url)}
-    console.log("Req url", req.url)
-    console.log("Req query", req.query)
-    console.log("Req body", req.body)
-    console.log("Req orig url", req.originalUrl)
+    console.log("Req url", req.url)   // todo
+    console.log("Req query", req.query)   // todo
+    console.log("Req body", req.body)   // todo
+    console.log("Req orig url", req.originalUrl)   // todo
     
     
     if (req.query.response_type === "link") {
@@ -43,9 +44,9 @@ app.get('/getImage', ((req, res) => {
     } else {
       try {
         let fileName = await helpers.randomFileName()
-        console.log("File Name = ", fileName)
+        console.log("File Name = ", fileName)   // todo
         res.sendFile(`${__dirname}/images/client/random/small/${fileName}`)
-        console.log('sent!')
+        console.log('sent!')   // todo
 
       } catch (error) {
         console.error(error);
@@ -89,15 +90,55 @@ app.get('/chico', ((req, res) => {
 app.get('/imageSearch', ((req, res) => {
 
     const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
-    req = https.request(url, res => {
-      console.log(`statusCode: ${res.statusCode}`)
+    https.get(url, res => {
+      console.log(`statusCode:   `, res.statusCode);
+      console.log(`statusMessage:`, res.statusMessage);
+      console.log(`headers:      `, res.headers);
+      
+      res.on('data', d => {
+        if(Buffer.isBuffer(d)){
+          d = d.toString();
+          let chico = JSON.parse(d)
+          console.log("Data! :", chico.items)
+        }
 
-      console.log(res.JSON)
+      })
+
+    }).on('error', (e) => {
+      console.error(e);
     })
 
-    req.on('error', err => console.error(err))
+
    res.send("Wow!")
 
+}))
+
+// ===== GOOGLE IMAGE SEARCH ==================================================
+
+app.get('/imageSearchTwo', ((req, res) => {
+  const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
+  
+  // Function that returns a Promise which resolves to Google search results.
+  // Search results are limited to 10 images.
+  function fetchGoogle(url) {
+    
+    return new Promise((res, rej) => {
+      request(url, {json:true}, function (error, response, body) {
+        
+        if (error || res.statusCode < 200 || res.statusCode > 400) {
+          rej(error || `${res.statusCode} indicates an error occurred`)
+          
+        } else {
+          res(body.items)
+        }
+      })
+        }
+    )
+  }
+
+  fetchGoogle(url).then((result) => {
+    res.json(result)}).catch(err => res.send(err))
+  
 }))
 
 // +++++++++++=  TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++++++

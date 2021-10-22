@@ -1,7 +1,7 @@
 {
   "name": "cs361-microservice",
   "version": "1.0.0",
-  "description": "",
+  "description": "API that returns an image link, or an image file",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -25,6 +25,7 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "request": "^2.88.2",
     "sharp": "^0.29.1",
     "shelljs": "^0.8.4"
   }

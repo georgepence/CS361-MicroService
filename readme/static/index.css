@@ -2,18 +2,18 @@ body {
   font-weight: 300;
 }
 
-.mycode {
+.my-code {
   font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 10pt;
   white-space: nowrap;
 }
 
-.myemph {
+.my-bold {
   font-weight: 500;
   color: darkblue;
 }
 
-.myemph2 {
+.my-bold-2 {
   font-weight: 425;
   color: darkblue;
 }

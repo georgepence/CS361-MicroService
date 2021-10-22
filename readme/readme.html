@@ -19,14 +19,14 @@
     <h6>
       1) You can issue a GET request to the following link:
     </h6>
-    <p class="mycode">
+    <p class="my-code">
       http://flip3.engr.oregonstate.edu:17778/getImage?response_type=link
     </p>
     <p>
-      The server <span class="myemph2">response</span> to this will be
-      JSON of a <span class="myemph2">link text</span>. If your client app then
+      The server <span class="my-bold-2">response</span> to this will be
+      JSON of a <span class="my-bold-2">link text</span>. If your client app then
       assigns the
-      <span class="myemph2">link text (the response)</span> as the 'src' of an 'img' HTML
+      <span class="my-bold-2">link text (the response)</span> as the 'src' of an 'img' HTML
       the browser will then call for the link, and the server will respond by
       sending the image file, and the image will
       rendered on the page.
@@ -35,21 +35,21 @@
     </p>
     <p>
       To see this in action, go to this github repository and look at the <a
-      class="myemph" href="https://github.com/georgepence/Image-Server-getLink">
+            class="my-bold" href="https://github.com/georgepence/Image-Server-getLink">
       github repository here</a>, and look specifically at the script at the
       bottom, which manipulates the "image-div" div element.
     </p>
     <h6>
       2) Alternatively, simply put the following into an image 'src' attribute:
     </h6>
-    <p class="mycode">
+    <p class="my-code">
       http://flip3.engr.oregonstate.edu:17778/getImage?response_type=file
     </p>
     <p>
       The Server will then simply send a random image file in response.
     <p>
       To see this in action, go to this github repository and look at the <a
-            class="myemph" href="https://github.com/georgepence/Image-Server-getLink">
+          class="my-bold" href="https://github.com/georgepence/Image-Server-getLink">
       github repository here</a>, and look specifically at the image element in
       the 'image-div-2' div element.
     </p>
@@ -71,7 +71,7 @@
       </li>
       <li>Clients will receive either of two types of responses:
         <ol>
-          <li>A <span class="myemph2">link</span> to an image file, which will be on this server, or</li>
+          <li>A <span class="my-bold-2">link</span> to an image file, which will be on this server, or</li>
           <li>The image file itself</li>
         </ol>
       </li>
@@ -79,11 +79,11 @@
   </section>
   <h3>Methods</h3>
   <p>I am setting everything up as GET requests, but may make it so that you
-    could use POST also.  We'll see...</p>
+    could use POST also. We'll see...</p>
   
   <h3>Options</h3>
   <p>
-    Below are my current thoughts regarding what you can request.  None of this
+    Below are my current thoughts regarding what you can request. None of this
     is implemented yet, except for "response_type".
   </p>
   <table class="table table-striped table-bordered">
@@ -132,7 +132,8 @@
       <th scope="row">searchTerms</th>
       <td>Optional</td>
       <td>random</td>
-      <td>"random" or no value will return a random image or link.  Search terms will return a Flikr or Google search with the search terms.
+      <td>"random" or no value will return a random image or link. Search terms will return a Flickr or Google search
+        with the search terms.
       </td>
       <td>In Development</td>
     </tr>
