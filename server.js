@@ -5,7 +5,8 @@ const https = require('https');
 // const http = require('http');      todo
 require('dotenv').config();
 const bodyParser = require('body-parser');
-const helpers = require('./helpers/readmeHelpers')
+const helpers = require('./helpers/readmeHelpers');
+const emailError = require('./helpers/emailError');
 const port = process.env.PORT || 5000;
 const path = require('path');
 
@@ -24,18 +25,11 @@ app.get('/getImage', ((req, res) => {
 
     let url = await helpers.randomFile()
     console.log("Here we go:  url = ", url)
+    
     if (url.error) {
       console.log(url.error)
       res.send(url.error)
     }
-
-    console.log("In main server, req.query = ", req.query.response_type == true, req.query.response_type)   // todo
-    if (req.query.response_type) {console.log(url)}
-    console.log("Req url", req.url)   // todo
-    console.log("Req query", req.query)   // todo
-    console.log("Req body", req.body)   // todo
-    console.log("Req orig url", req.originalUrl)   // todo
-    
     
     if (req.query.response_type === "link") {
       // URL of the image
@@ -116,29 +110,36 @@ app.get('/imageSearch', ((req, res) => {
 // ===== GOOGLE IMAGE SEARCH ==================================================
 
 app.get('/imageSearchTwo', ((req, res) => {
-  const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
+  const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=imageha'
   
   // Function that returns a Promise which resolves to Google search results.
   // Search results are limited to 10 images.
   function fetchGoogle(url) {
     
     return new Promise((res, rej) => {
-      request(url, {json:true}, function (error, response, body) {
+      request(url, {json: true}, function (error, response, body) {
         
-        if (error || res.statusCode < 200 || res.statusCode > 400) {
-          rej(error || `${res.statusCode} indicates an error occurred`)
+        if (body.error) {
+          rej(body.error.message)
           
         } else {
           res(body.items)
         }
+        
       })
-        }
-    )
+    })
   }
-
-  fetchGoogle(url).then((result) => {
-    res.json(result)}).catch(err => res.send(err))
   
+  fetchGoogle(url)
+      .then((result) => {
+        res.json(result)
+      })
+      .catch((err) => {
+        let message = `<p>Error in Google search</p><p>${err}</p>`
+        emailError.send(message)
+            .catch((err) => console.log("error", err))
+        res.send(err)
+      })
 }))
 
 // +++++++++++=  TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++++++
