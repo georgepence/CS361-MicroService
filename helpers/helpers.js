@@ -88,6 +88,7 @@ async function getFilePath(args) {
   const files = await fsProm.readdir('./images/random/large')
   let num = Math.floor(Math.random() * files.length) + 1
   let original = "./images/random/large/" + num + ".jpeg"
+  console.log("original = ", original)
   
   // Take image and resize it to size = args || default
 
