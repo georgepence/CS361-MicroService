@@ -42,8 +42,8 @@ app.get('/getImage', ((req, res) => {
       try {
         // let fileName = await helpers.randomFileName()  // TODO
         // console.log("File Name = ", fileName)          // TODO
+        
         res.sendFile(`${__dirname}/images/client/${url.filePath}${url.fileName}`)
-        console.log('sent!')                          // TODO
 
       } catch (error) {
         emailError.send(url.error)
