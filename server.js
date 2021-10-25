@@ -5,7 +5,7 @@ const https = require('https');
 // const http = require('http');      todo
 require('dotenv').config();
 const bodyParser = require('body-parser');
-const helpers = require('./helpers/readmeHelpers');
+const helpers = require('./helpers/helpers');
 const emailError = require('./helpers/emailError');
 const port = process.env.PORT || 5000;
 const path = require('path');
@@ -23,32 +23,36 @@ app.get('/getImage', ((req, res) => {
 
   async function fetchRandom(req) {
 
-    let url = await helpers.randomFile()
-    console.log("Here we go:  url = ", url)
+    // let url = await helpers.randomFile()         //  TODO
+    
+    // Get host, filePath, fileName of image to send client
+    let url = await helpers.getFilePath(req.query);
     
     if (url.error) {
-      console.log(url.error)
       res.send(url.error)
+      emailError.send(url.error)
+          .catch((err) => console.log("error", err))
     }
     
     if (req.query.response_type === "link") {
       // URL of the image
-      res.json(url)
+      res.json(url.host + '/image?image=' + url.filePath + url.fileName)
 
     } else {
       try {
-        let fileName = await helpers.randomFileName()
-        console.log("File Name = ", fileName)   // todo
-        res.sendFile(`${__dirname}/images/client/random/small/${fileName}`)
-        console.log('sent!')   // todo
+        // let fileName = await helpers.randomFileName()  // TODO
+        // console.log("File Name = ", fileName)          // TODO
+        res.sendFile(`${__dirname}/images/client/${url.filePath}${url.fileName}`)
+        console.log('sent!')                          // TODO
 
       } catch (error) {
-        console.error(error);
+        emailError.send(url.error)
+            .catch((err) => console.log("error", err))
       }
 
     }
   }
-  console.log("Starting")
+
   fetchRandom(req).finally(() =>{})
 
 }))
@@ -164,7 +168,7 @@ app.get('/test2', function(req, res){
 
 app.get('/image', (req, res) => {
   let image = req.query.image
-  res.sendFile(__dirname + '/images/client/random/small/' + image)
+  res.sendFile(__dirname + '/images/client/' + image)
 })
 
 app.get('/', ((req, res) => {

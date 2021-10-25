@@ -4,7 +4,7 @@ const request = require('request');
 // const http = require('http');    todo
 require('dotenv').config();
 const bodyParser = require('body-parser');
-const helpers = require('../helpers/readmeHelpers');
+const helpers = require('../helpers/helpers');
 const port = process.env.PORT || 6515;
 const serverURL = process.env.SERVER || 'http://localhost:5000'
 const fs = require('fs')
