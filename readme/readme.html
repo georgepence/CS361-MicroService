@@ -61,7 +61,9 @@
     <h3>General notes:</h3>
     <ul>
       <li>My best guess is that each Client will have an apiKey. I am thinking that
-        this will allow tracking, in order to:
+        this will allow tracking, in order to do the following.  On the other hand,
+        if each client only does certain types of requests ('search' vs. 'random'), I
+        can use that to provide customization.
         <ol>
           <li>Allow each client to have different 'default' settings, such as image size</li>
           <li>Ensure fresh images are served, not duplicates of images previously
@@ -101,7 +103,7 @@
       <th scope="row">apiKey</th>
       <td>Required</td>
       <td class="none">-</td>
-      <td>An apiKey will be provided to clients</td>
+      <td>An apiKey may be provided to clients</td>
       <td>In Development</td>
     </tr>
     <tr>
