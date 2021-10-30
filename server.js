@@ -7,6 +7,7 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const helpers = require('./helpers/helpers');
 const emailError = require('./helpers/emailError');
+const googleSearch = require('./helpers/googleSearch');
 const port = process.env.PORT || 5000;
 const path = require('path');
 
@@ -87,30 +88,43 @@ app.get('/getImage', ((req, res) => {
 
 app.get('/imageSearch', ((req, res) => {
 
-  const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
+  async function fetchGoogle(args) {
+    let googleData;
+    googleData = await googleSearch.googleSearch(args);
 
-  // -----------  HTTPS GET ----------------------------------------------------
-  https.get(url, res => {
-    console.log(`statusCode:   `, res.statusCode);
-    console.log(`statusMessage:`, res.statusMessage);
-    console.log(`headers:      `, res.headers);
+    if (googleData.error) {
+      emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData)}</p>`)
+    }
+    return googleData
+  }
 
-    res.on('data', d => {
-          if (Buffer.isBuffer(d)) {
-            d = d.toString();
+  fetchGoogle({searchTerms: "dog"}).then((result) => res.json(result) )
 
-            // console.log("Data! :", d)
-          }
-        }
-    )
-  console.log("here")
-  }).on('error', (e) => {
-    console.error("Error in /imageSearch: ", e);
-  })
-  // -----------  HTTPS GET ----------------------------------------------------
 
-  console.log("res.body = ", res._body)
-  res.send("res._body")
+  // const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
+  //
+  // // -----------  HTTPS GET ----------------------------------------------------
+  // https.get(url, res => {
+  //   console.log(`statusCode:   `, res.statusCode);
+  //   console.log(`statusMessage:`, res.statusMessage);
+  //   console.log(`headers:      `, res.headers);
+  //
+  //   res.on('data', d => {
+  //         if (Buffer.isBuffer(d)) {
+  //           d = d.toString();
+  //
+  //           // console.log("Data! :", d)
+  //         }
+  //       }
+  //   )
+  // console.log("here")
+  // }).on('error', (e) => {
+  //   console.error("Error in /imageSearch: ", e);
+  // })
+  // // -----------  HTTPS GET ----------------------------------------------------
+  //
+  // console.log("res.body = ", res._body)
+  // res.send("res._body")
 
 }))
 

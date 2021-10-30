@@ -83,6 +83,10 @@ app.get('/testRoute', (req, res) => {
   res.json('/images/client/myfiles/myFetchImage.jpg')
 })
 
+app.get('/imageSearch', ((req, res) => {
+  res.sendFile(path.join(`${__dirname}`,'imageSearch.html'))
+}));
+
 app.get('/', ((req, res) => {
   res.sendFile(path.join(`${__dirname}`,'readme.html'))
 }));
