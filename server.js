@@ -57,57 +57,60 @@ app.get('/getImage', ((req, res) => {
 
 }))
 
-// ============================================================================
-app.get('/chico', ((req, res) => {
-  console.log("Found Chico!!")
-  res.send(JSON.stringify("I am a small dog"))
-
-  async function Chico() {
-    // URL of the image
-    const url = 'https://web.engr.oregonstate.edu/~penceg/roscoe-memorial/images/gate.jpeg?width=450';
-
-    https.get(url,(res) => {
-      console.log("Status = ", res.statusCode)
-      // Image will be stored at this path
-      const path = `${__dirname}/mac-app/images/cave.jpeg`;
-      console.log("path = ", path)
-      const filePath = fs.createWriteStream(path);
-      res.pipe(filePath);
-      filePath.on('finish',() => {
-        filePath.close();
-        console.log('Download Completed');
-      })
-    })
-  }
-
-  Chico().then((res) => console.log("yahoo!!", res)).catch(err => console.log(err));
-
-}))
+// ===============================================================  // TODO
+// app.get('/chico', ((req, res) => {
+//   console.log("Found Chico!!")
+//   res.send(JSON.stringify("I am a small dog"))
+//
+//   async function Chico() {
+//     // URL of the image
+//     const url = 'https://web.engr.oregonstate.edu/~penceg/roscoe-memorial/images/gate.jpeg?width=450';
+//
+//     https.get(url,(res) => {
+//       console.log("Status = ", res.statusCode)
+//       // Image will be stored at this path
+//       const path = `${__dirname}/mac-app/images/cave.jpeg`;
+//       console.log("path = ", path)
+//       const filePath = fs.createWriteStream(path);
+//       res.pipe(filePath);
+//       filePath.on('finish',() => {
+//         filePath.close();
+//         console.log('Download Completed');
+//       })
+//     })
+//   }
+//
+//   Chico().then((res) => console.log("yahoo!!", res)).catch(err => console.log(err));
+//
+// }))
 // ============================================================================
 
 app.get('/imageSearch', ((req, res) => {
 
-    const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
-    https.get(url, res => {
-      console.log(`statusCode:   `, res.statusCode);
-      console.log(`statusMessage:`, res.statusMessage);
-      console.log(`headers:      `, res.headers);
-      
-      res.on('data', d => {
-        if(Buffer.isBuffer(d)){
-          d = d.toString();
-          let chico = JSON.parse(d)
-          console.log("Data! :", chico.items)
+  const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
+
+  // -----------  HTTPS GET ----------------------------------------------------
+  https.get(url, res => {
+    console.log(`statusCode:   `, res.statusCode);
+    console.log(`statusMessage:`, res.statusMessage);
+    console.log(`headers:      `, res.headers);
+
+    res.on('data', d => {
+          if (Buffer.isBuffer(d)) {
+            d = d.toString();
+
+            // console.log("Data! :", d)
+          }
         }
+    )
+  console.log("here")
+  }).on('error', (e) => {
+    console.error("Error in /imageSearch: ", e);
+  })
+  // -----------  HTTPS GET ----------------------------------------------------
 
-      })
-
-    }).on('error', (e) => {
-      console.error(e);
-    })
-
-
-   res.send("Wow!")
+  console.log("res.body = ", res._body)
+  res.send("res._body")
 
 }))
 
