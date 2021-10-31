@@ -22,7 +22,6 @@ app.use(bodyParser.json());
 
 app.get('/getServer', (req, res) => {
   res.json(serverURL);
-  console.log("In getServer, server = ", serverURL);
 })
 
 app.get('/getImage', (req, res) => {

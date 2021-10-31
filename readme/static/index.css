@@ -70,3 +70,8 @@ h6 {
 .card-body {
   height: 245px;
 }
+
+#search-body .container {
+  max-width: none;
+  margin: 1em;
+}
