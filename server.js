@@ -38,7 +38,9 @@ app.get('/getImage', ((req, res) => {
     if (req.query.response_type === "link") {
       // URL of the image
       res.json(url.host + '/image?image=' + url.filePath + url.fileName)
-
+  
+    } else if (req.query.response_type === "random") {
+      res.json(url.original);
     } else {
       try {
         // let fileName = await helpers.randomFileName()  // TODO

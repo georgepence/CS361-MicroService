@@ -110,7 +110,11 @@ async function getFilePath(args) {
   }
   
   // Return link and location information to image file
-  return { host: hostPath ,filePath: imageFile.filePath, fileName:imageFile.fileName }
+  return {
+    host: hostPath,
+    filePath: imageFile.filePath,
+    fileName: imageFile.fileName,
+    original: 'https://web.engr.oregonstate.edu/~penceg/images/large/' + num + '.jpeg' }
 
 }
 
