@@ -88,6 +88,8 @@ app.get('/getImage', ((req, res) => {
 
 app.get('/imageSearch', ((req, res) => {
 
+  let args = req.query
+
   async function fetchGoogle(args) {
     let googleData;
     googleData = await googleSearch.googleSearch(args);
@@ -98,7 +100,7 @@ app.get('/imageSearch', ((req, res) => {
     return googleData
   }
 
-  fetchGoogle({searchTerms: "dog"}).then((result) => res.json(result) )
+  fetchGoogle(args).then((result) => res.json(result) )
 
 
   // const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
