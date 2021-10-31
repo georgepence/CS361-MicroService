@@ -71,16 +71,16 @@ async function getFilePath(args) {
   let status = { error: false }
   let googleData = {}
   
-  // If there are search terms, try a google or flicker search, grab url.
-  if (args.searchTerms && !(args.searchTerms === "random")) {
-    googleData = await googleSearch.googleSearch(args)
-    
-    // Set status.error = true on Google error, triggering an alternate search
-    if (googleData.error) {
-      status.error = true;
-      emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData)}</p>`)
-    }
-  }
+  // If there are search terms, try a google or flicker search, grab url.  // TODO:  PUT THIS BACK!!!
+  // if (args.searchTerms && !(args.searchTerms === "random")) {
+  //   googleData = await googleSearch.googleSearch(args)
+  //
+  //   // Set status.error = true on Google error, triggering an alternate search
+  //   if (googleData.error) {
+  //     status.error = true;
+  //     emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData)}</p>`)
+  //   }
+  // }
   
   // If there are no search terms, or the above search fails, grab a random
   // file from disk.
