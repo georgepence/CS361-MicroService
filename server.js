@@ -1,13 +1,16 @@
 const express = require('express');
 const request = require('request');
 const cors = require('cors');
-const https = require('https');
-// const http = require('http');      todo
+const fs = require('fs');
+const https = require('https');                           // TODO
+// const http = require('http');                          // TODO
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const helpers = require('./helpers/helpers');
+const logFile = require('./helpers/logFile');
 const emailError = require('./helpers/emailError');
 const googleSearch = require('./helpers/googleSearch');
+const flickrSearch = require('./helpers/flickrSearch')
 const port = process.env.PORT || 5000;
 const path = require('path');
 
@@ -18,74 +21,61 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
-console.log("At the top")
+
+// ======  >>>>    MAIN PATH TO GET IMAGES    <<<<  ===========================
 
 app.get('/getImage', ((req, res) => {
 
-  async function fetchRandom(req) {
+  async function fetchImage(req) {
 
-    // let url = await helpers.randomFile()         //  TODO
-    
-    // Get host, filePath, fileName of image to send client
+    // Get location of image to send client
     let url = await helpers.getFilePath(req.query);
+  
+    // Capture info to logging
+
+    // let reqQuery = req.query === {} ? "none" : JSON.stringify(req.query);  //T ODO
+    let reqInfo = {
+      userInfo: JSON.stringify(req.headers["user-agent"]),
+      reqQuery: !req.query ? "none" : JSON.stringify(req.query),
+      urlResult: url.original
+    }
+    
+    let requestHeaders = JSON.stringify(req.headers["user-agent"])
+    
+    console.log("URL = ", url);       //  TODO
     
     if (url.error) {
-      res.send(url.error)
-      emailError.send(url.error)
+      res.send(url.error);
+      emailError.send(`<p>Error getting image url</p><p>${url.error}</p>`)
           .catch((err) => console.log("error", err))
     }
     
     if (req.query.response_type === "link") {
-      // URL of the image
       res.json(url.host + '/image?image=' + url.filePath + url.fileName)
   
     } else if (req.query.response_type === "random") {
       res.json(url.original);
+      
     } else {
       try {
-        // let fileName = await helpers.randomFileName()  // TODO
-        // console.log("File Name = ", fileName)          // TODO
-        
         res.sendFile(`${__dirname}/images/client/${url.filePath}${url.fileName}`)
 
       } catch (error) {
-        emailError.send(url.error)
+        emailError.send(`<p>Error with sendFile in server</p><p>${error}</p>`)
             .catch((err) => console.log("error", err))
       }
-
     }
+    
+    // Add results to log file
+    if (process.env.NODE_ENV === 'production') { logFile.createLog(reqInfo) }
+    
   }
 
-  fetchRandom(req).finally(() =>{})
+  fetchImage(req).finally(() =>{})
 
 }))
 
-// ===============================================================  // TODO
-// app.get('/chico', ((req, res) => {
-//   console.log("Found Chico!!")
-//   res.send(JSON.stringify("I am a small dog"))
-//
-//   async function Chico() {
-//     // URL of the image
-//     const url = 'https://web.engr.oregonstate.edu/~penceg/roscoe-memorial/images/gate.jpeg?width=450';
-//
-//     https.get(url,(res) => {
-//       console.log("Status = ", res.statusCode)
-//       // Image will be stored at this path
-//       const path = `${__dirname}/mac-app/images/cave.jpeg`;
-//       console.log("path = ", path)
-//       const filePath = fs.createWriteStream(path);
-//       res.pipe(filePath);
-//       filePath.on('finish',() => {
-//         filePath.close();
-//         console.log('Download Completed');
-//       })
-//     })
-//   }
-//
-//   Chico().then((res) => console.log("yahoo!!", res)).catch(err => console.log(err));
-//
-// }))
+
 // ============================================================================
 
 app.get('/imageSearch', ((req, res) => {
@@ -103,33 +93,7 @@ app.get('/imageSearch', ((req, res) => {
   }
 
   fetchGoogle(args).then((result) => res.json(result) )
-
-
-  // const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=image'
-  //
-  // // -----------  HTTPS GET ----------------------------------------------------
-  // https.get(url, res => {
-  //   console.log(`statusCode:   `, res.statusCode);
-  //   console.log(`statusMessage:`, res.statusMessage);
-  //   console.log(`headers:      `, res.headers);
-  //
-  //   res.on('data', d => {
-  //         if (Buffer.isBuffer(d)) {
-  //           d = d.toString();
-  //
-  //           // console.log("Data! :", d)
-  //         }
-  //       }
-  //   )
-  // console.log("here")
-  // }).on('error', (e) => {
-  //   console.error("Error in /imageSearch: ", e);
-  // })
-  // // -----------  HTTPS GET ----------------------------------------------------
-  //
-  // console.log("res.body = ", res._body)
-  // res.send("res._body")
-
+  
 }))
 
 // ===== GOOGLE IMAGE SEARCH ==================================================
@@ -164,6 +128,16 @@ app.get('/imageSearchTwo', ((req, res) => {
         emailError.send(message)
             .catch((err) => console.log("error", err))
         res.send(err)
+      })
+}))
+
+// ===== FLICKR IMAGE SEARCH ==================================================
+
+app.get('/flickrSearch', ((req, res) => {
+  
+  flickrSearch.search({})
+      .then((result) => {
+        res.send(result)
       })
 }))
 

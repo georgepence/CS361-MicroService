@@ -1,5 +1,14 @@
+function startListening() {
+  document.getElementById("searchSource").addEventListener("change", () => {
+    console.log("changed!")
+    let form = document.getElementById("sourceForm");
+    
+    fetchImage(form.elements["searchSource"].value)
+    
+  })
+}
 
-async function fetchImage() {
+async function fetchImage(source) {
 
   // ==========  GET SERVER URL  ==============================================
   async function getServerUrl() {
@@ -19,45 +28,87 @@ async function fetchImage() {
         readme: 'http://flip3.engr.oregonstate.edu:6515'
       }
     }}
-  // ==========  GET SERVER URL  ==============================================
+  // ==========  END OF GET SERVER URL  =======================================
+  
   let serverURL = await getServerUrl()
-
-
   
   let imageDiv = document.getElementById("searchResults");
   let htmlCode = ''
   
-  for (let i = 0; i < 2; i++) {
+  // ==========  GOOGLE SEARCH   ==============================================
   
-    let url = serverURL.main + `/imageSearch?searchTerms=dog&imgSize=xlarge&start=${(i * 10) + 1}`
+  if (source !== 'flickr') {
+    
+    for (let i = 0; i < 2; i++) {
+    
+      let url = serverURL.main + `/imageSearch?searchTerms=dog&imgSize=xlarge&start=${(i * 10) + 1}`
+      let result = await fetch(url);
+      let data = await result.json();
+    
+      if (data.error) {
+        htmlCode += `<p>Error accessing Google API</p>` +
+            `<p>${data.error}</p>`
+      } else {
+      
+        htmlCode += '<div class="row mt-1 mb-1">'
+      
+        await data.map((gResult, index) => {
+
+          htmlCode += `<div id="c-${index}" ` +
+              `class="col-xl-2 col-md-3 col-sm-6 mt-1 mb-1" >` +
+              `<img src=${gResult.image.thumbnailLink} alt=${gResult.title} />` +
+              `<p>${gResult.image.width} x ${gResult.image.height}</p>` +
+              `</div>`
+        })
+        htmlCode += '</div>'
+      }
+    }
+  }
+  
+  // ==========  FLICKR SEARCH   ==============================================
+  
+  if (source !== 'google') {
+    
+    let url = serverURL.main + `/flickrSearch`
     let result = await fetch(url);
     let data = await result.json();
-    
-    if (data.error) {
-      htmlCode += `<p>Error accessing Google API</p>` +
-          `<p>${data.error}</p>`
-    } else {
-      console.log("data data = ", data)
   
-      htmlCode += '<div class="row mt-1 mb-1">'
-      // console.log("after row", htmlCode)               // Todo
+    htmlCode += '<div class="row mt-1 mb-1">'
   
-      await data.map((gResult, index) => {
-        // console.log("in data.map", index, htmlCode)    // Todo
-        htmlCode += `<div id="c-${index}" ` +
-            `class="col-xl-2 col-md-3 col-sm-6 mt-1 mb-1" >` +
-            `<img src=${gResult.image.thumbnailLink} alt=${gResult.title} />` +
-            `<p>${gResult.image.width} x ${gResult.image.height}</p>` +
-            `</div>`
-      })
-      // console.log("after data.map", htmlCode)          // Todo
-      htmlCode += '</div>'
-      // console.log(htmlCode)
-    }
+    await data.map((fResult, index) => {
+      let iUrl = `https://live.staticflickr.com/${fResult.server}/${fResult.id}_${fResult.secret}_m.jpg`
+      htmlCode += `<div id="c-${index}" ` +
+          `class="col-xl-2 col-md-4 col-sm-6 mt-1 mb-1" >` +
+          `<img src=${iUrl} alt=image ${index}  ${fResult.title} />` +
+          // `<p>${gResult.image.width} x ${gResult.image.height}</p>` +
+          `</div>`
+    })
+  
+    htmlCode += '</div>'
     
+    // if (data.error) {
+    //   htmlCode += `<p>Error accessing Google API</p>` +
+    //       `<p>${data.error}</p>`
+    // } else {
+    //
+    //   htmlCode += '<div class="row mt-1 mb-1">'
+    //
+    //   await data.map((gResult, index) => {
+    //
+    //     htmlCode += `<div id="c-${index}" ` +
+    //         `class="col-xl-2 col-md-3 col-sm-6 mt-1 mb-1" >` +
+    //         `<img src=${gResult.image.thumbnailLink} alt=${gResult.title} />` +
+    //         `<p>${gResult.image.width} x ${gResult.image.height}</p>` +
+    //         `</div>`
+    //   })
+    //   htmlCode += '</div>'
+    // }
   }
+  
+  // ==========  END OF SEARCH   ==============================================
                           // Todo
   imageDiv.innerHTML = htmlCode
 }
-
-fetchImage().finally(() => {})
+let imageSource = 'both';
+fetchImage(imageSource).finally(() => {});
+startListening();
