@@ -15,6 +15,7 @@ const pool = mysql.createPool({
 // wrapper that makes pool queries return a promise
 function promisePool(query, vars){
   return new Promise((res, rej) => {
+    console.log("In dbcon, query = ", query, vars)
     pool.query(query, vars, (err, rows, fields) => {
       if (err){
         console.log("Here in dbcon error:  rej = ", err);

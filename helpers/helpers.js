@@ -1,12 +1,42 @@
 const fsProm = require('fs/promises');
 const fs = require('fs');
 const path = require('path');
+const flickrSearch = require('./flickrSearch');
 const googleSearch = require('./googleSearch');
-const emailError = require('./emailError')
-const processImage = require('./processImage')
+const emailError = require('./emailError');
+const updateCache = require('./updateCache');
+const createCache = require('./createCache');
+const download = require('./download');
+const processImage = require('./processImage');
+const queryDb = require('../database/dbcon');
+const request = require("request");
 require('dotenv').config();
 
 const port = process.env.PORT
+let original, originalUrl
+let imageFile = { fileName: '', filePath: ''}
+
+async function getHostPath() {
+  if(process.env.NODE_ENV === 'development') {
+    return `http://localhost:${process.env.PORT}`
+  } else {
+    // In 'production' (deployed)
+    return `http://flip3.engr.oregonstate.edu:${process.env.PORT}`
+  }
+}
+
+async function pause() {
+  await new Promise((resolve) => {
+    setTimeout(
+        () => {
+          console.log("Taking time out");
+          resolve("success")
+        },
+        500
+    );
+
+})
+}
 
 // TODO:  REPLACE THIS AND DELETE
 // async function randomFile() {
@@ -67,54 +97,155 @@ const port = process.env.PORT
 // ============================================================================
 
 // Take arguments (args) and return { host, fileName, filePath } of image
-async function getFilePath(args) {
-  let status = { error: false }
-  let googleData = {}
+async function getFilePath(args, cacheStatus) {
+  let status = {
+    error: false,
+    busy: false
+  };
+  let googleData = {};
+  let imageExt
+  
+  if (args.response_type === 'random') {
+    
+    if(args.flickrSearch === 'flickrSearch') {
+  
+      console.log("In filePath, args = ", args)         // TODO
+      let result = { pages: 60000 }
+  
+      if (!result.photo && false) {                         // TODO Fix this
+        status = {error: true};
+        emailError.send(`<p>Error in getFilePath / flickrSearch</p><p>${JSON.stringify(result)}</p>`)
+      } else {
+    
+        randomPage = Math.floor(Math.random() * result.pages);
+        args.randomPage = randomPage;
+    
+        let photos = await flickrSearch.search(args);
+        if (photos.length === 0) {console.log()}
+        let randomPhoto = Math.floor(Math.random() * photos.photo.length);
+        console.log("!!!!!!!!!!!!!!!!!!!!!!  R A N D O M = ", randomPhoto, " of ", photos.photo.length)
+        let photo = photos.photo[randomPhoto];
+        originalUrl = `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`
+      }
+    } else {
+      console.log("In filePath, args = ", args)         // TODO
+      cacheStatus.unfinishedGets += 1;
+      
+      let dbQuery = 'select `RandomUrls`.`url` from `RandomUrls` where `RandomUrls`.`id` = ' +
+          '(select min(`RandomUrls`.`id`) as `oldest` from `RandomUrls`);'
+      let dbDeleteQuery = 'delete from `RandomUrls` where `RandomUrls`.`id` = ' +
+          '(select min(`RandomUrls`.`id`) as `oldest` from `RandomUrls`);'
+  
+      let dbRsponse = await queryDb( dbQuery, [] );
+      console.log("DB Response : ", dbRsponse[0].url);
+      console.log(`\n`);
+      originalUrl = dbRsponse[0].url;
+      await queryDb( dbDeleteQuery, [] ).then(() => {
+        console.log(" >>>>> In helpers, just deleted an url, unfinished gets = ", cacheStatus.unfinishedGets);
+        cacheStatus.unfinishedGets -= 1;
+        if (!cacheStatus.unfinishedGets) {
+          createCache.fillCache(cacheStatus)
+        }
+      })
+    }
+    
+    // let result = await flickrSearch.search(args);      // TODO Maybe put back
+
+  }
   
   // If there are search terms, try a google or flicker search, grab url.  // TODO:  PUT THIS BACK!!!
-  // if (args.searchTerms && !(args.searchTerms === "random")) {
-  //   googleData = await googleSearch.googleSearch(args)
-  //
-  //   // Set status.error = true on Google error, triggering an alternate search
-  //   if (googleData.error) {
-  //     status.error = true;
-  //     emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData)}</p>`)
-  //   }
-  // }
+  else if (args.searchTerms && !(args.searchTerms === "random")) {
+    console.log("here in non-random")
+    let foundGoogleImage = false
+    googleData = await googleSearch.googleSearch(args)
+    
+    if (googleData.error) {
+      status.error = true;
+      emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData)}</p>`)
   
+      // ============================================================================
+      // TODO: send error back to client, or try another method
+      // ============================================================================
+      
+    }
+    let idx = 0;
+    // Take image link at image 0 and test
+    while (!foundGoogleImage && idx < 10) {
+
+      originalUrl = googleData[idx].link;
+      imageExt = (
+          originalUrl.includes('?') ?
+              path.extname(originalUrl)
+                  .substring(0, path.extname(originalUrl).indexOf('?'))
+              :
+              path.extname(originalUrl)
+      );
+
+      if (['.jpg', '.png', '.tif', '.tiff', '.jpeg'].includes(imageExt)) {
+        foundGoogleImage = true;
+      }
+    idx += 1;
+    }
+
+  
+    // Set status.error = true on Google error, triggering an alternate search  // TODO
+
+    // originalUrl = googleData[Math.floor(Math.random() * googleData.length)].link
+    console.log("Google results = ", originalUrl, "Extension = ", path.extname(originalUrl));
+    imageFile.fileName = 'googleImage' + imageExt;
+    imageFile.filePath = './images/client/general/';
+    while (status.busy) {
+      await pause();
+    }
+    status.busy = true;
+    // await download.get(originalUrl, imageFile.filePath + imageFile.fileName).then(() => {});
+    status.busy = false;
+    console.log("File downloaded, back in helpers")
+  }
+
   // If there are no search terms, or the above search fails, grab a random
   // file from disk.
-  
+
+  /*   // THIS CODE COULD BE USED TO PULL RANDOM FILE FROM DISK
   const files = await fsProm.readdir('./images/random/large')
   let num = Math.floor(Math.random() * files.length) + 1
-  let original = "./images/random/large/" + num + ".jpeg"
+  original = "./images/random/large/" + num + ".jpeg"
+   */
   
   // Take image and resize it to size = args || default
-
-  let imageFile = {}
-  let width = parseInt(args.width) || 800
-  let height = parseInt(args.height) || 800
-  imageFile = await processImage.resize(original, {width: width, height: height})
-
-  
-  // Save file to 'general' (if search) and replace, or save to 'random' as
-  // a new file in sequence (keeping old files).
-  
-  // return link to random image file
-  let hostPath
-  if(process.env.NODE_ENV === 'development') {
-    hostPath = `http://localhost:${process.env.PORT}`
-  } else {
-    // In 'production' (deployed)
-    hostPath = `http://flip3.engr.oregonstate.edu:${process.env.PORT}`
+  if ((args.width || args.height) || !(args.response_type === "random")) {
+    console.log("BUSYSTATUS = ", status.busy)
+    let width = parseInt(args.width) || 800
+    let height = parseInt(args.height) || 800
+    imageFile = await download.get(originalUrl, imageFile.filePath + imageFile.fileName, imageFile)
+        .then((imageFile) => {
+          let metadata = processImage.getMetadata(imageFile.filePath + imageFile.fileName)
+          return metadata
+        })
+        .then((metadata) => {
+          let result = processImage
+              .resize(imageFile.filePath +
+                  imageFile.fileName, metadata, {
+                width: width,
+                height: height,
+                destination: imageFile.filePath,
+                fileName: imageFile.fileName
+              })
+          return result
+        })
   }
+  console.log("I'm finished resizing.  imageFile = ", imageFile)
+  
+  let hostPath = getHostPath();
+  
+  console.log(`:::::::::::::::::::\n`)
   
   // Return link and location information to image file
   return {
     host: hostPath,
-    filePath: imageFile.filePath,
+    filePath: imageFile.filePath.substr(1),
     fileName: imageFile.fileName,
-    original: 'https://web.engr.oregonstate.edu/~penceg/images/large/' + num + '.jpeg' }
+    originalUrl: originalUrl }
 
 }
 

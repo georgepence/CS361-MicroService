@@ -86,6 +86,10 @@ app.get('/imageSearch', ((req, res) => {
   res.sendFile(path.join(`${__dirname}`,'imageSearch.html'))
 }));
 
+app.get('/flickrTest', ((req, res) => {
+  res.sendFile(path.join(`${__dirname}`,'flickrTest.html'))
+}));
+
 app.get('/', ((req, res) => {
   res.sendFile(path.join(`${__dirname}`,'readme.html'))
 }));

@@ -33,6 +33,7 @@ async function fetchImage(source) {
   let serverURL = await getServerUrl()
   
   let imageDiv = document.getElementById("searchResults");
+  let flickrCountDiv = document.getElementById("flickr-count");
   let htmlCode = ''
   
   // ==========  GOOGLE SEARCH   ==============================================
@@ -72,19 +73,23 @@ async function fetchImage(source) {
     let url = serverURL.main + `/flickrSearch`
     let result = await fetch(url);
     let data = await result.json();
-  
+
     htmlCode += '<div class="row mt-1 mb-1">'
+    console.log("here in flickr")
+    let flickrCount = 0;
   
-    await data.map((fResult, index) => {
-      let iUrl = `https://live.staticflickr.com/${fResult.server}/${fResult.id}_${fResult.secret}_m.jpg`
+    await data.photo.map((fResult, index) => {
+      flickrCount += 1
+      let iUrl = `https://live.staticflickr.com/${fResult.server}/${fResult.id}_${fResult.secret}_h.jpg`
       htmlCode += `<div id="c-${index}" ` +
           `class="col-xl-2 col-md-4 col-sm-6 mt-1 mb-1" >` +
           `<img src=${iUrl} alt=image ${index}  ${fResult.title} />` +
-          // `<p>${gResult.image.width} x ${gResult.image.height}</p>` +
+          `<p>Count = ${index}</p>` +
           `</div>`
     })
-  
+    
     htmlCode += '</div>'
+    let flickrCountCode = `# of Flicker Photos: ${flickrCount}`
     
     // if (data.error) {
     //   htmlCode += `<p>Error accessing Google API</p>` +
@@ -103,11 +108,13 @@ async function fetchImage(source) {
     //   })
     //   htmlCode += '</div>'
     // }
+    flickrCountDiv.innerHTML = flickrCountCode
   }
   
   // ==========  END OF SEARCH   ==============================================
                           // Todo
   imageDiv.innerHTML = htmlCode
+  
 }
 let imageSource = 'both';
 fetchImage(imageSource).finally(() => {});

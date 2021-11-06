@@ -7,6 +7,8 @@ const https = require('https');                           // TODO
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const helpers = require('./helpers/helpers');
+const createCache = require('./helpers/createCache');
+const updateCache = require('./helpers/updateCache');
 const logFile = require('./helpers/logFile');
 const emailError = require('./helpers/emailError');
 const googleSearch = require('./helpers/googleSearch');
@@ -21,6 +23,14 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
+const cacheStatus = {
+  updating: false,
+  needsUpdate: false,
+  desiredCacheSize: parseInt(process.env.CACHE_SIZE) || 50,
+  unfinishedGets: 0
+}
+
+createCache.fillCache(cacheStatus).then(() => {});
 
 // ======  >>>>    MAIN PATH TO GET IMAGES    <<<<  ===========================
 
@@ -29,11 +39,12 @@ app.get('/getImage', ((req, res) => {
   async function fetchImage(req) {
 
     // Get location of image to send client
-    let url = await helpers.getFilePath(req.query);
-  
+    let url = await helpers.getFilePath(req.query, cacheStatus);
+    
+    console.log("I'm here, back in server.js /getImage")      // TODO
     // Capture info to logging
 
-    // let reqQuery = req.query === {} ? "none" : JSON.stringify(req.query);  //T ODO
+    // let reqQuery = req.query === {} ? "none" : JSON.stringify(req.query);  //TODO
     let reqInfo = {
       userInfo: JSON.stringify(req.headers["user-agent"]),
       reqQuery: !req.query ? "none" : JSON.stringify(req.query),
@@ -42,7 +53,7 @@ app.get('/getImage', ((req, res) => {
     
     let requestHeaders = JSON.stringify(req.headers["user-agent"])
     
-    console.log("URL = ", url);       //  TODO
+    console.log("server.js says URL = ", url);       //  TODO
     
     if (url.error) {
       res.send(url.error);
@@ -54,11 +65,11 @@ app.get('/getImage', ((req, res) => {
       res.json(url.host + '/image?image=' + url.filePath + url.fileName)
   
     } else if (req.query.response_type === "random") {
-      res.json(url.original);
+      res.json(url.originalUrl);
       
     } else {
       try {
-        res.sendFile(`${__dirname}/images/client/${url.filePath}${url.fileName}`)
+        res.sendFile(`${__dirname}${url.filePath}${url.fileName}`)
 
       } catch (error) {
         emailError.send(`<p>Error with sendFile in server</p><p>${error}</p>`)
@@ -73,6 +84,20 @@ app.get('/getImage', ((req, res) => {
 
   fetchImage(req).finally(() =>{})
 
+}))
+
+// =================  TESTING CACHE OPERATIONS  ===============================
+
+app.get('/cache', ((req, res) => {
+  
+  createCache.fillCache().then((result) => res.json(result) )
+  
+}))
+
+app.get('/updateCache', ((req, res) => {
+  
+  updateCache.Update().then((result) => res.json(result) )
+  
 }))
 
 
@@ -137,6 +162,7 @@ app.get('/flickrSearch', ((req, res) => {
   
   flickrSearch.search({})
       .then((result) => {
+        console.log("result = ", result)
         res.send(result)
       })
 }))
@@ -144,6 +170,7 @@ app.get('/flickrSearch', ((req, res) => {
 // +++++++++++=  TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // Without middleware
+
 app.get('/test2', function(req, res){
   var options = {
     root: path.join(__dirname, '/images/client/')
@@ -163,7 +190,8 @@ app.get('/test2', function(req, res){
 
 app.get('/image', (req, res) => {
   let image = req.query.image
-  res.sendFile(__dirname + '/images/client/' + image)
+  console.log("In /image", req.query.image, __dirname)
+  res.sendFile(__dirname + image)
 })
 
 app.get('/', ((req, res) => {
