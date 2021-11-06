@@ -21,6 +21,7 @@ async function fetchImage(source) {
   // ==========  END OF GET SERVER URL  =======================================
   
   let serverURL = await getServerUrl()
+  console.log("Server = ", serverURL)
   
   let imageDiv = document.getElementById("searchResults");
   let flickrCountDiv = document.getElementById("flickr-count");
