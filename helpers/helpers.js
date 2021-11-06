@@ -169,10 +169,14 @@ async function getFilePath(args, cacheStatus) {
       
     }
     let idx = 0;
+    console.log("0 here", googleData[0].link)
+    console.log("1 here", googleData[1].link)
+    console.log("2 here", googleData[2].link)
     // Take image link at image 0 and test
     while (!foundGoogleImage && idx < 10) {
 
       originalUrl = googleData[idx].link;
+      console.log(originalUrl, idx)
       imageExt = (
           originalUrl.includes('?') ?
               path.extname(originalUrl)
@@ -183,8 +187,9 @@ async function getFilePath(args, cacheStatus) {
 
       if (['.jpg', '.png', '.tif', '.tiff', '.jpeg'].includes(imageExt)) {
         foundGoogleImage = true;
+      } else {
+        idx += 1
       }
-    idx += 1;
     }
 
   

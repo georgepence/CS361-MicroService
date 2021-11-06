@@ -38,6 +38,9 @@ app.get('/getImage', ((req, res) => {
 
   async function fetchImage(req) {
 
+    if (req.query.response_type === 'link' && !req.query.searchTerms) {
+      req.query.response_type = 'random'
+    }
     // Get location of image to send client
     let url = await helpers.getFilePath(req.query, cacheStatus);
     
