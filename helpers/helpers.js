@@ -16,7 +16,7 @@ const port = process.env.PORT
 let original, originalUrl
 let imageFile = { fileName: '', filePath: ''}
 
-async function getHostPath() {
+function getHostPath() {
   if(process.env.NODE_ENV === 'development') {
     return `http://localhost:${process.env.PORT}`
   } else {
@@ -123,7 +123,7 @@ async function getFilePath(args, cacheStatus, googleStatus) {
         let photos = await flickrSearch.search(args);
         if (photos.length === 0) {console.log()}
         let randomPhoto = Math.floor(Math.random() * photos.photo.length);
-        console.log("!!!!!!!!!!!!!!!!!!!!!!  R A N D O M = ", randomPhoto, " of ", photos.photo.length)
+
         let photo = photos.photo[randomPhoto];
         originalUrl = `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`
       }
@@ -149,12 +149,8 @@ async function getFilePath(args, cacheStatus, googleStatus) {
       })
     }
     
-    // let result = await flickrSearch.search(args);      // TODO Maybe put back
 
-  }
-  
-  // If there are search terms, try a google or flicker search, grab url.  // TODO:  PUT THIS BACK!!!
-  else if (
+  } else if (
       args.searchTerms &&
       !(args.searchTerms === "random") &&
       !googleStatus.quotaLimitReached
@@ -163,10 +159,12 @@ async function getFilePath(args, cacheStatus, googleStatus) {
     let foundGoogleImage = false
     googleData = await googleSearch.googleSearch(args)
     console.log("googleData", googleData, googleData.error, typeof googleData)
+    console.log("Boolean googleData.error", !googleData.error)
   
     if (googleData.error) {
       status.error = true;
-      emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData)}</p>`)
+      console.log("status.error = True")
+      await emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData.error)}</p>`)
     
       // ============================================================================
       // TODO: send error back to client, or try another method
@@ -175,9 +173,7 @@ async function getFilePath(args, cacheStatus, googleStatus) {
     }
   
     let idx = 0;
-    console.log("0 here", googleData[0].link)
-    console.log("1 here", googleData[1].link)
-    console.log("2 here", googleData[2].link)
+
     // Take image link at image 0 and test
     while (!foundGoogleImage && idx < 10) {
 
@@ -264,7 +260,6 @@ async function getFilePath(args, cacheStatus, googleStatus) {
           return result
         })
   }
-  console.log("I'm finished resizing.  imageFile = ", imageFile)
   
   let hostPath = getHostPath();
   
