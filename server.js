@@ -30,6 +30,10 @@ const cacheStatus = {
   unfinishedGets: 0
 }
 
+const googleStatus = {
+  quotaLimitReached: true
+}
+
 createCache.fillCache(cacheStatus).then(() => {});
 
 // ======  >>>>    MAIN PATH TO GET IMAGES    <<<<  ===========================
@@ -42,7 +46,7 @@ app.get('/getImage', ((req, res) => {
       req.query.response_type = 'random'
     }
     // Get location of image to send client
-    let url = await helpers.getFilePath(req.query, cacheStatus);
+    let url = await helpers.getFilePath(req.query, cacheStatus, googleStatus);
     
     console.log("I'm here, back in server.js /getImage")      // TODO
     // Capture info to logging

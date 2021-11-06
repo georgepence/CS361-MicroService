@@ -14,7 +14,7 @@ async function googleSearch(args) {
   
   return new Promise((res, rej) => {
     request(url, {json: true}, function (error, response, body) {
-      
+      console.log("body = ", body, body.error, typeof body, typeof body.error)
       if (body.error) {
         res(body)
   

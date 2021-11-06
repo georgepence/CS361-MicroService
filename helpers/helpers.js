@@ -97,7 +97,7 @@ async function pause() {
 // ============================================================================
 
 // Take arguments (args) and return { host, fileName, filePath } of image
-async function getFilePath(args, cacheStatus) {
+async function getFilePath(args, cacheStatus, googleStatus) {
   let status = {
     error: false,
     busy: false
@@ -154,20 +154,26 @@ async function getFilePath(args, cacheStatus) {
   }
   
   // If there are search terms, try a google or flicker search, grab url.  // TODO:  PUT THIS BACK!!!
-  else if (args.searchTerms && !(args.searchTerms === "random")) {
+  else if (
+      args.searchTerms &&
+      !(args.searchTerms === "random") &&
+      !googleStatus.quotaLimitReached
+  ) {
     console.log("here in non-random")
     let foundGoogleImage = false
     googleData = await googleSearch.googleSearch(args)
-    
+    console.log("googleData", googleData, googleData.error, typeof googleData)
+  
     if (googleData.error) {
       status.error = true;
       emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData)}</p>`)
-  
+    
       // ============================================================================
       // TODO: send error back to client, or try another method
       // ============================================================================
-      
+    
     }
+  
     let idx = 0;
     console.log("0 here", googleData[0].link)
     console.log("1 here", googleData[1].link)
@@ -206,6 +212,25 @@ async function getFilePath(args, cacheStatus) {
     // await download.get(originalUrl, imageFile.filePath + imageFile.fileName).then(() => {});
     status.busy = false;
     console.log("File downloaded, back in helpers")
+  } else {
+    let width = parseInt(args.width) || 800
+    let height = parseInt(args.height) || 800
+    const files = await fsProm.readdir('./images/random/large')
+    let num = Math.floor(Math.random() * files.length) + 1
+    original = "./images/random/large/" + num + ".jpeg"
+    imageFile.filePath = "./images/client/general/";
+    imageFile.fileName = num + ".jpeg"
+    
+    let metadata = await processImage.getMetadata("./images/random/large/" + imageFile.fileName)
+
+    imageFile = await processImage.resize("./images/random/large/" +
+            imageFile.fileName, metadata, {
+          width: width,
+          height: height,
+          destination: imageFile.filePath,
+          fileName: imageFile.fileName
+        })
+
   }
 
   // If there are no search terms, or the above search fails, grab a random
@@ -218,7 +243,7 @@ async function getFilePath(args, cacheStatus) {
    */
   
   // Take image and resize it to size = args || default
-  if ((args.width || args.height) || !(args.response_type === "random")) {
+  if ((args.width || args.height || !(args.response_type === "random")) && !googleStatus.quotaLimitReached) {
     console.log("BUSYSTATUS = ", status.busy)
     let width = parseInt(args.width) || 800
     let height = parseInt(args.height) || 800
