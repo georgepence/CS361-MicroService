@@ -31,7 +31,7 @@ const cacheStatus = {
 }
 
 const googleStatus = {
-  quotaLimitReached: true
+  quotaLimitReached: false
 }
 
 createCache.fillCache(cacheStatus).then(() => {});
