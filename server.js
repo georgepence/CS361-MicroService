@@ -55,7 +55,7 @@ app.get('/getImage', ((req, res) => {
     let reqInfo = {
       userInfo: JSON.stringify(req.headers["user-agent"]),
       reqQuery: !req.query ? "none" : JSON.stringify(req.query),
-      urlResult: url.original
+      urlResult: url.originalURL
     }
     
     let requestHeaders = JSON.stringify(req.headers["user-agent"])
