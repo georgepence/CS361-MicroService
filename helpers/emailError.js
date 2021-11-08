@@ -12,6 +12,9 @@ async function emailError(message) {
   // Only needed if you don't have a real mail account for testing
   // let testAccount = await nodemailer.createTestAccount();
   
+  // Console log error, in case google decides not to send e-mail
+  await console.log(`\n`, '!'.repeat(80), `\n`, Date().toString(), `\n`, message,`\n`, '!'.repeat(80))
+  
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     service: "Gmail",
