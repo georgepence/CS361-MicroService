@@ -11,6 +11,11 @@ async function download(url, dest, imageFile) {
   /* Create an empty file where we can save data */
   const file = fs.createWriteStream(dest);
   
+  console.log('~'.repeat(28), 'in download', '~'.repeat(29))
+  console.log('url :', url)
+  console.log('dest:', dest)
+  console.log('~'.repeat(80))
+  
   /* Using Promises so that we can use the ASYNC AWAIT syntax */
   return new Promise((resolve, reject) => {
     request({
