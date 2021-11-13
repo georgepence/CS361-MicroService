@@ -3,14 +3,18 @@ const googleSearch = require('./googleSearch');
 const cacheSearch = require('./cacheSearch');
 const e = require("express");
 
-function setSearchEngine(clientReq) {
+function setSearchEngine(clientReq, googleStatus) {
  
   if ((clientReq.response_type === 'random') &&
       !clientReq.width &&
       !clientReq.height) {
 
    return cacheSearch;
-  }  else {
+   
+  }  else if(googleStatus.quotaLimitReached) {
+    return flickrSearch;
+    
+  } else {
     return  googleSearch;
   }
 

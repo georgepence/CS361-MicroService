@@ -12,7 +12,7 @@ const getHostPath = require('./utilities/getHostPath')
 async function getImage(clientReq, cacheStatus, googleStatus) {
   
   
-  if (googleStatus.quotaLimitReached) { clientReq.response_type = 'random' }
+  // if (googleStatus.quotaLimitReached) { clientReq.response_type = 'random' }
   
   // Initialize
   let engine = setSearchEngine(clientReq, googleStatus);

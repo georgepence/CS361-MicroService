@@ -2,7 +2,6 @@ const queryDb = require('../../database/dbcon');
 const getRandomUrl = require("./getRandomUrl");
 const getCacheSize = require('./checkCacheSize')
 
-// Delete a url from RandomUrls table
 
 async function addUrls(cacheStatus, cacheSize) {
   
@@ -21,8 +20,9 @@ async function addUrls(cacheStatus, cacheSize) {
         .catch(err => console.log(err))
         .finally(() => {});
     
-    cacheSize = getCacheSize();
-    needToAdd = cacheStatus.desiredCacheSize < cacheSize
+    cacheSize = await getCacheSize();
+    needToAdd = cacheStatus.desiredCacheSize > cacheSize
+    console.log("AddUrls: Need to Add = ", needToAdd, cacheSize, cacheStatus.desiredCacheSize)
   }
 }
 
