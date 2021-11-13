@@ -1,20 +1,21 @@
 const express = require('express');
 const request = require('request');
 const cors = require('cors');
-const fs = require('fs');
-const https = require('https');                           // TODO
+const fs = require('fs');                              // TODO
+// const https = require('https');                        // TODO
 // const http = require('http');                          // TODO
 require('dotenv').config();
 const bodyParser = require('body-parser');
-const helpers = require('./helpers/helpers');
-const createCache = require('./helpers/createCache');
-const updateCache = require('./helpers/updateCache');
-const logFile = require('./helpers/logFile');
-const emailError = require('./helpers/emailError');
-const googleSearch = require('./helpers/googleSearch');
-const flickrSearch = require('./helpers/flickrSearch')
+const helpers = require('./helpers/getImage');
+const createCache = require('./helpers/updateCache');
+// const updateCache = require('./helpers/updateCache');  // TODO
+const logFile = require('./helpers/utilities/logFile');
+const pause = require('./helpers/utilities/pause');
+const emailError = require('./helpers/utilities/emailError');
+const googleSearch = require('./helpers/search/googleSearch');
+const flickrSearch = require('./helpers/search/flickrSearch')
 const port = process.env.PORT || 5000;
-const path = require('path');
+// const path = require('path');                          // TODO
 
 const app = express();
 
@@ -26,12 +27,12 @@ app.use(bodyParser.json());
 const cacheStatus = {
   updating: false,
   needsUpdate: false,
-  desiredCacheSize: parseInt(process.env.CACHE_SIZE) || 50,
+  desiredCacheSize: parseInt(process.env.CACHE_SIZE) || 100,
   unfinishedGets: 0
 }
 
 const googleStatus = {
-  quotaLimitReached: false
+  quotaLimitReached: true
 }
 
 createCache.fillCache(cacheStatus).then(() => {});
@@ -42,53 +43,45 @@ app.get('/getImage', ((req, res) => {
 
   async function fetchImage(req) {
 
-    if (req.query.response_type === 'link' && !req.query.searchTerms) {
+    // TODO:  This needs to be handled differently
+    if (!(req.query.response_type === 'random') && !req.query.searchTerms) {
       req.query.response_type = 'random'
     }
+    
     // Get location of image to send client
-    let url = await helpers.getFilePath(req.query, cacheStatus, googleStatus);
+    let image = await helpers.getImage(req.query, cacheStatus, googleStatus);
     
-    console.log("I'm here, back in server.js /getImage")      // TODO
-    // Capture info to logging
-
-    // let reqQuery = req.query === {} ? "none" : JSON.stringify(req.query);  //TODO
-    let reqInfo = {
-      userInfo: JSON.stringify(req.headers["user-agent"]),
-      reqQuery: !req.query ? "none" : JSON.stringify(req.query),
-      urlResult: url.originalUrl ?
-          url.originalUrl :
-          url.host + '/image?image=' + url.filePath + url.fileName
-    }
+    console.log("server.js says I got imageInfo --> ", image);       //  TODO
     
-    let requestHeaders = JSON.stringify(req.headers["user-agent"])
-    
-    console.log("server.js says URL = ", url);       //  TODO
-    
-    if (url.error) {
-      res.send(url.error);
-      emailError.send(`<p>Error getting image url</p><p>${url.error}</p>`)
+    if (image.error) {
+      res.send(image.error === true);
+      emailError.send(`<p>Error getting image url</p><p>${image.error}</p>`)
           .catch((err) => console.log("error", err))
-    }
-    
-    if (req.query.response_type === "link") {
-      res.json(url.host + '/image?image=' + url.filePath + url.fileName)
-  
-    } else if (req.query.response_type === "random") {
-      res.json(url.originalUrl);
-      
     } else {
-      try {
-        res.sendFile(`${__dirname}${url.filePath}${url.fileName}`)
-
-      } catch (error) {
-        emailError.send(`<p>Error with sendFile in server</p><p>${error}</p>`)
-            .catch((err) => console.log("error", err))
+  
+      if (req.query.response_type === "link") {
+        res.json(image.host + '/image?image=' + image.filePath + image.fileName)
+    
+      } else if (req.query.response_type === "random") {
+        res.json(image.sourceUrl);
+    
+      } else {
+        try {
+          res.sendFile(`${__dirname}${image.filePath}${image.fileName}`)
+      
+        } catch (error) {
+          emailError.send(`<p>Error with sendFile in server</p><p>${error}</p>`)
+              .catch((err) => console.log("error", err))
+        }
       }
+      
     }
     
-    // Add results to log file
-    if (process.env.NODE_ENV === 'production') { logFile.createLog(reqInfo) }
     
+    
+
+    // Create log entry in db log table
+    if (process.env.NODE_ENV === 'production') { logFile.writeEntry(req, image) }
   }
 
   fetchImage(req).finally(() =>{})
@@ -97,17 +90,18 @@ app.get('/getImage', ((req, res) => {
 
 // =================  TESTING CACHE OPERATIONS  ===============================
 
-app.get('/cache', ((req, res) => {
-  
-  createCache.fillCache().then((result) => res.json(result) )
-  
-}))
+// app.get('/cache', ((req, res) => {
+//
+//   createCache.fillCache().then((result) => res.json(result) )
+//
+// }))
 
-app.get('/updateCache', ((req, res) => {
-  
-  updateCache.Update().then((result) => res.json(result) )
-  
-}))
+// // TODO
+// app.get('/updateCache', ((req, res) => {
+//
+//   updateCache.Update().then((result) => res.json(result) )
+//
+// }))
 
 
 // ============================================================================
@@ -178,22 +172,22 @@ app.get('/flickrSearch', ((req, res) => {
 
 // +++++++++++=  TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-// Without middleware
+// ToDo
 
-app.get('/test2', function(req, res){
-  var options = {
-    root: path.join(__dirname, '/images/client/')
-  };
-
-  var fileName = 'chico.txt';
-  res.sendFile(fileName, options, function (err) {
-    if (err) {
-      next(err);
-    } else {
-      console.log('Sent:', fileName);
-    }
-  });
-});
+// app.get('/test2', function(req, res){
+//   var options = {
+//     root: path.join(__dirname, '/images/client/')
+//   };
+//
+//   var fileName = 'chico.txt';
+//   res.sendFile(fileName, options, function (err) {
+//     if (err) {
+//       next(err);
+//     } else {
+//       console.log('Sent:', fileName);
+//     }
+//   });
+// });
 
 // +++++++++++=  END TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -221,7 +215,7 @@ app.use(function(err, req, res, next){
   console.error(err.stack);
   res.type('plain/text');
   res.status(500);
-  res.send('500 - Server Error');
+  res.send('500 - Image Server Error');
 });
 
 app.listen(port, ()=> console.log(`server started on port ${port}.`));

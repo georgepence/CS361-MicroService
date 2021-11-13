@@ -32,7 +32,7 @@ async function fetchImage(source) {
 async function fetchLinks() {
   let url = serverURL.main + `/getImage?response_type=random`
   let imageLinks = [];
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 4; i++) {
     console.log("IMAGELINKS = ", imageLinks)
     let imageLink = await fetch(url)
         .then(response => response.json())

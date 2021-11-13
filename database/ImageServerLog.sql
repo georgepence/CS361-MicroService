@@ -7,6 +7,8 @@
 -- Server version: 10.4.21-MariaDB-log
 -- PHP Version: 7.4.23
 
+--  THIS SQL FILE CAN SET UP LOG DATABASE ON NEW HOST (SUCH AS HEROKU)
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -39,13 +41,13 @@ CREATE TABLE `ImageServerLog` (
 -- Dumping data for table `ImageServerLog`
 --
 
-INSERT INTO `ImageServerLog` (`id`, `time`, `userInfo`, `reqQuery`, `urlResult`) VALUES
-(10, '2021-11-03 11:25:33', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{\"response_type\":\"link\"}', 'https://web.engr.oregonstate.edu/~penceg/images/large/3.jpeg'),
-(11, '2021-11-03 11:28:06', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{\"response_type\":\"link\"}', 'https://web.engr.oregonstate.edu/~penceg/images/large/2.jpeg'),
-(12, '2021-11-03 11:28:16', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{}', 'https://web.engr.oregonstate.edu/~penceg/images/large/12.jpeg'),
-(13, '2021-11-03 11:29:51', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{}', 'https://web.engr.oregonstate.edu/~penceg/images/large/14.jpeg'),
-(14, '2021-11-03 11:29:58', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{\"response_type\":\"link\"}', 'https://web.engr.oregonstate.edu/~penceg/images/large/1.jpeg'),
-(15, '2021-11-03 11:30:03', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{\"response_type\":\"file\"}', 'https://web.engr.oregonstate.edu/~penceg/images/large/10.jpeg');
+--INSERT INTO `ImageServerLog` (`id`, `time`, `userInfo`, `reqQuery`, `urlResult`) VALUES
+--(10, '2021-11-03 11:25:33', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{\"response_type\":\"link\"}', 'https://web.engr.oregonstate.edu/~penceg/images/large/3.jpeg'),
+--(11, '2021-11-03 11:28:06', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{\"response_type\":\"link\"}', 'https://web.engr.oregonstate.edu/~penceg/images/large/2.jpeg'),
+--(12, '2021-11-03 11:28:16', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{}', 'https://web.engr.oregonstate.edu/~penceg/images/large/12.jpeg'),
+--(13, '2021-11-03 11:29:51', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{}', 'https://web.engr.oregonstate.edu/~penceg/images/large/14.jpeg'),
+--(14, '2021-11-03 11:29:58', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{\"response_type\":\"link\"}', 'https://web.engr.oregonstate.edu/~penceg/images/large/1.jpeg'),
+--(15, '2021-11-03 11:30:03', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36', '{\"response_type\":\"file\"}', 'https://web.engr.oregonstate.edu/~penceg/images/large/10.jpeg');
 
 --
 -- Indexes for dumped tables

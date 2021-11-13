@@ -1,8 +1,10 @@
 let request = require('request');
-let parseString = require('xml2js').parseString;
-let apiKey = 'api_key=f05fe4b6609f1ceb4f6ca45a9158f361';
-let userId = 'user_id=32758310%40N04'
-let groupId = 'group_id=34427469792%40N01'
+// let parseString = require('xml2js').parseString;         // TODO
+// let userId = 'user_id=32758310%40N04'                    // TODO
+require('dotenv').config();
+
+let apiKey = 'api_key=' + process.env.FLICKR_KEY;
+let groupId = 'group_id=34427469792%40N01';
 
 let method;
 
@@ -24,7 +26,7 @@ async function search(args) {
     method  = 'method=flickr.groups.pools.getPhotos'
     url += `${method}&${apiKey}&${groupId}&${page}format=json&nojsoncallback=1`
   }
-  console.log("In flickrSearch. url =", url);
+
   // Function that returns a Promise which resolves to JSON search results.
   
   return new Promise((res, rej) => {
@@ -32,7 +34,7 @@ async function search(args) {
 
       if (!body.photos) {
         console.log("error")
-        res(body);
+        rej(body);
       }
       if (body.photos.photo.length === 0) {console.log(body)}
       res(body.photos);

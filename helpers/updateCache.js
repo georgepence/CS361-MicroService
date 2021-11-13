@@ -1,73 +1,49 @@
-const emailError = require('./emailError');
-const queryDb = require('../database/dbcon');
-const flickrSearch = require('./helpers');
-const createCache = require('./createCache');
+const checkCacheSize = require('./cache/checkCacheSize');
+const deleteUrls = require('./cache/deleteUrls');
+const addUrls = require('./cache/addUrls');
 require('dotenv').config();
 
-let desiredCache = parseInt(process.env.CACHE_SIZE) || 50
+// Manage size of flickr image link cache stored in db table RandomUrls table
 
-async function Insert(url) {
-    
-
-    console.log("In insert... url = ", url)
-    
-    let result = await queryDb(
-        'insert into RandomUrls (`url`) values (?)',
-        [url]
-    )
-        .catch(err => isError = true)
-        .finally(() => console.log(`Finished adding to cache to ${url.originalUrl}`));
+async function fillCache(cacheStatus) {
   
-}
-
-async function Delete() {
+  let cacheSize = await checkCacheSize();
   
-  let oldestUrl = await queryDb(
-      'select min(`RandomUrls`.`id`) as `oldest` from `RandomUrls`;',
-      []
-  )
-      .then((result) => {
+  cacheStatus.needsUpdate = !(cacheSize === cacheStatus.desiredCacheSize);
+  
+  console.log(`\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`)  // TODO
+  console.log(`S T A R T I N G      C A C H E      U P D A T E         cacheSize =`, cacheSize)
+  console.log('updating:', cacheStatus.updating, '  needsUpdate:', cacheStatus.needsUpdate, '  desiredCacheSize:', cacheStatus.desiredCacheSize, '  unfinishedGets:', cacheStatus.unfinishedGets)
+  console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n`)
+  
+  if (cacheStatus.updating || cacheStatus.unfinishedGets) {
+    console.log("In fillCache.  Can't update at this time", cacheStatus);
+  
+  } else {
+
+    console.log('In updateCache, starting')
+    console.log('booleans', 'size > desired', cacheSize > cacheStatus.desiredCacheSize, '!updating', !cacheStatus.updating, '!unfinished', !cacheStatus.unfinishedGets)
+    // while (cacheStatus.needsUpdate) {
+      if (cacheSize > cacheStatus.desiredCacheSize && !cacheStatus.updating && !cacheStatus.unfinishedGets) {
+        cacheStatus.updating = true
+        await deleteUrls(cacheStatus, cacheSize)
         
-        let dbRsponse = queryDb(
-            'delete from `RandomUrls` where `RandomUrls`.`id` = ' + `${result[0].oldest};`,
-            []
-        )
-        console.log("DB Response : ", dbRsponse)
-      })
-      .catch((err) => console.log("Cache is empty", err))
-      .finally(() => console.log(`Finished reducing cache to ${desiredCache}`))
+      }
+      if (cacheSize < cacheStatus.desiredCacheSize && !cacheStatus.updating && !cacheStatus.unfinishedGets) {
+        cacheStatus.updating = true
+        await addUrls(cacheStatus, cacheSize)
+      }
+      cacheSize = await checkCacheSize();
+      console.log("In updateCache - finished ? , size =", cacheSize, typeof cacheSize, typeof cacheStatus.desiredCacheSize)
+      cacheStatus.needsUpdate = !(cacheSize === cacheStatus.desiredCacheSize);
+    // }
+  }
+  cacheStatus.updating = false
+  
+  console.log(`\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`)  // TODO
+  console.log(`F I N I S H E D      C A C H E      U P D A T E         cacheSize =`, cacheSize);
+  console.log('updating:', cacheStatus.updating, '  needsUpdate:', cacheStatus.needsUpdate, '  desiredCacheSize:', cacheStatus.desiredCacheSize, '  unfinishedGets:', cacheStatus.unfinishedGets)
+  console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n`)
 }
 
-async function Update() {
-  
-  console.log("In Update")
-  let url = await flickrSearch.getFilePath({
-    response_type: 'random',
-    flickrSearch: 'flickrSearch'
-  })
-      .catch(err => isError = true);
-  
-  await Insert(url.originalUrl)
-      .then(() => Delete())
-      .finally(() => {
-    
-  });
-  
-  let cacheSize = await queryDb(
-      'select count(`RandomUrls`.`url`) as `count` from `RandomUrls`;',
-      []
-  )
-  cacheSize = cacheSize[0].count
-  console.log("Who are you? ", cacheSize, typeof cacheSize, desiredCache, typeof desiredCache)
-  
-  if (cacheSize !== desiredCache) {
-    let message = `<p>Error: cache size should be ${desiredCache}, but it is ${cacheSize}</p>`;
-    emailError.send(message);
-    console.log(message);
-    createCache.fillCache();
-    }
-    
-}
-
-exports.Update = Update;
-exports.Delete = Delete;
+exports.fillCache = fillCache;

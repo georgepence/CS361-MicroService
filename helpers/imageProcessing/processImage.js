@@ -1,5 +1,5 @@
 const sharp = require('sharp');
-const emailError = require('./emailError');
+const emailError = require('../utilities/emailError');
 const path = require('path');
 
 async function getMetadata(image) {
@@ -18,21 +18,16 @@ async function getMetadata(image) {
         })
         .finally(() => console.log("done"));
   })
-
-  
 }
 
 async function resize(image, imageData, args) {
   
   // Get original image dimensions
   sharp.cache(false);
-  
-  console.log("here in resize", args, image)
 
   // let imageData = await sharp(image).metadata();
   let width = imageData.width;
   let height = imageData.height;
-  console.log("Image data = ", imageData)
   
   return new Promise((res, rej) => {
 
@@ -43,29 +38,29 @@ async function resize(image, imageData, args) {
         (!args.height || (width / height) >= (args.width / args.height))) {
       sharp(image)
           .resize({width: args.width})
-          .toFile(destination + 'image.jpg')
+          .toFile(destination + fileName)
           .then(() => {
             console.log("Finished reducing width.  Response is ", fileName, destination)
-            res({ fileName: 'image.jpg', filePath: destination })
+            res({ fileName: fileName, filePath: destination })
           })
-          .catch((err) => res({error: err}));
+          .catch((err) => res({error: err, image:imageData }));
     
     } else if (args.height && height > args.height &&
         (!args.width || (width / height) < (args.width / args.height))) {
       sharp(image)
           .resize({height: args.height})
-          .toFile(destination + 'image.jpg')
+          .toFile(destination + fileName)
           .then(() => {
             console.log("Finished reducing height.  Response is ", fileName, destination)
-            res({ fileName: 'image.jpg', filePath: destination })
+            res({ fileName: fileName, filePath: destination })
           })
           .catch((err) => res({error: err}));
     } else {
       sharp(image)
-          .toFile(destination + 'image.jpg')
+          .toFile(destination + fileName)
           .then(() => {
             console.log("Finished, no processing.  Response is ", fileName, destination)
-            res({ fileName: 'image.jpg', filePath: destination })
+            res({ fileName: fileName, filePath: destination })
           })
           .catch((err) => res({error: err}));
     }

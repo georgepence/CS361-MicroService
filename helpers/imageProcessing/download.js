@@ -3,8 +3,8 @@
 
 const request = require('request');
 const fs = require('fs');
-const path = require('path');
-const emailError = require("./emailError");
+// const path = require('path');                 // TODO
+const emailError = require("../utilities/emailError");
 
 async function download(url, dest, imageFile) {
   
@@ -12,11 +12,9 @@ async function download(url, dest, imageFile) {
   const file = fs.createWriteStream(dest);
   
   console.log('~'.repeat(28), 'in download', '~'.repeat(29))
-  console.log('url :', url)
-  console.log('dest:', dest)
+  console.log('url :', url, '    dest:', dest)
   console.log('~'.repeat(80))
   
-  /* Using Promises so that we can use the ASYNC AWAIT syntax */
   return new Promise((resolve, reject) => {
     request({
       /* Here you should specify the exact link to the file you are trying to download */
@@ -33,17 +31,10 @@ async function download(url, dest, imageFile) {
   })
       .catch((error) => {
         let message = `<p>Error downloading image file from url ${url} to ${dest}</p><p>${error}</p>`
-        emailError.send(message)
+        emailError.send(message);
         console.log(`Something happened: ${error}`);
         
       }).finally(() => console.log("FINISHED !!! DOWNLOADING !!!"));
 }
-
-// example
-
-// (async () => {
-//   const data = await download('https://random.dog/vh7i79y2qhhy.jpg', './images/image.jpg');
-//   console.log(data); // The file is finished downloading.
-// })();
 
 exports.get = download

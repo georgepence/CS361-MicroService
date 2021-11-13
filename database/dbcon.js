@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const emailError = require('../helpers/emailError');
+const emailError = require('../helpers/utilities/emailError');
 require('dotenv').config();
 
 // init mysql
@@ -15,10 +15,10 @@ const pool = mysql.createPool({
 // wrapper that makes pool queries return a promise
 function promisePool(query, vars){
   return new Promise((res, rej) => {
-    console.log("In dbcon, query = ", query, vars)
+    console.log("In dbcon, query = ", query, vars)              // TODO
     pool.query(query, vars, (err, rows, fields) => {
       if (err){
-        console.log("Here in dbcon error:  rej = ", err);
+        console.log("Here in dbcon error:  rej = ", err);       // TODO
         emailError.send(`<p>Error in dbcon</p><p>${err}</p>`)
         rej(err);
       } else {
@@ -27,9 +27,5 @@ function promisePool(query, vars){
     })
   });
 }
-
-// alternative -- this may need some adjusting to work
-// i.e. the call part might not be quite right
-const promisePool2 = (query, vars) => promisify(pool.query).call(query, vars);
 
 module.exports = promisePool
