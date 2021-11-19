@@ -3,7 +3,6 @@
 
 const request = require('request');
 const fs = require('fs');
-// const path = require('path');                 // TODO
 const emailError = require("../utilities/emailError");
 
 async function download(url, dest, imageFile) {

@@ -1,21 +1,17 @@
 const express = require('express');
 const request = require('request');
 const cors = require('cors');
-const fs = require('fs');                              // TODO
-// const https = require('https');                        // TODO
-// const http = require('http');                          // TODO
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const helpers = require('./helpers/getImage');
-const createCache = require('./helpers/updateCache');
-// const updateCache = require('./helpers/updateCache');  // TODO
+const updateCache = require('./helpers/updateCache');
 const logFile = require('./helpers/utilities/logFile');
+const clearImageFiles = require('./helpers/utilities/deleteAllFiles');
 const pause = require('./helpers/utilities/pause');
 const emailError = require('./helpers/utilities/emailError');
 const googleSearch = require('./helpers/search/googleSearch');
 const flickrSearch = require('./helpers/search/flickrSearch')
 const port = process.env.PORT || 5000;
-// const path = require('path');                          // TODO
 
 const app = express();
 
@@ -31,11 +27,12 @@ const cacheStatus = {
   unfinishedGets: 0
 }
 
-const googleStatus = {
-  quotaLimitReached: true
-}
+const clearingImageFile = { status: true };
+const googleStatus = { quotaLimitReached: false };
 
-createCache.fillCache(cacheStatus).then(() => {});
+clearImageFiles('./images/client/general', clearingImageFile);
+updateCache.fillCache(cacheStatus).then(() => {});
+
 
 // ======  >>>>    MAIN PATH TO GET IMAGES    <<<<  ===========================
 
@@ -50,36 +47,36 @@ app.get('/getImage', ((req, res) => {
     
     // Get location of image to send client
     let image = await helpers.getImage(req.query, cacheStatus, googleStatus);
-    
     console.log("server.js says I got imageInfo --> ", image);       //  TODO
     
+    // Error
     if (image.error) {
       res.send(image.error === true);
       emailError.send(`<p>Error getting image url</p><p>${image.error}</p>`)
           .catch((err) => console.log("error", err))
+      
     } else {
-  
+      // Send link or file, based on client url request query arguments
+      
+      // Send link to processed image on server (keyword search, response_type=link)
       if (req.query.response_type === "link") {
         res.json(image.host + '/image?image=' + image.filePath + image.fileName)
     
+        // Send link to original image from external site (response_type=random)
       } else if (req.query.response_type === "random") {
         res.json(image.sourceUrl);
     
+        // Send image file from server (keyword search, response_type=file)
       } else {
         try {
           res.sendFile(`${__dirname}${image.filePath}${image.fileName}`)
-      
         } catch (error) {
           emailError.send(`<p>Error with sendFile in server</p><p>${error}</p>`)
               .catch((err) => console.log("error", err))
         }
       }
-      
     }
     
-    
-    
-
     // Create log entry in db log table
     if (process.env.NODE_ENV === 'production') { logFile.writeEntry(req, image) }
   }
@@ -92,7 +89,7 @@ app.get('/getImage', ((req, res) => {
 
 // app.get('/cache', ((req, res) => {
 //
-//   createCache.fillCache().then((result) => res.json(result) )
+//   updateCache.fillCache().then((result) => res.json(result) )
 //
 // }))
 
@@ -104,92 +101,11 @@ app.get('/getImage', ((req, res) => {
 // }))
 
 
-// ============================================================================
-
-app.get('/imageSearch', ((req, res) => {
-
-  let args = req.query
-
-  async function fetchGoogle(args) {
-    let googleData;
-    googleData = await googleSearch.googleSearch(args);
-
-    if (googleData.error) {
-      emailError.send(`<p>Error in getFilePath / googleSearch</p><p>${JSON.stringify(googleData)}</p>`)
-    }
-    return googleData
-  }
-
-  fetchGoogle(args).then((result) => res.json(result) )
-  
-}))
-
-// ===== GOOGLE IMAGE SEARCH ==================================================
-
-app.get('/imageSearchTwo', ((req, res) => {
-  const url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAqsEc83ZtQM-aUDoxqyUSKZ4nK6gyXRAg&cx=1d51ed3d0c23e53c2&q=lectures&searchType=imageha'
-  
-  // Function that returns a Promise which resolves to Google search results.
-  // Search results are limited to 10 images.
-  function fetchGoogle(url) {
-    
-    return new Promise((res, rej) => {
-      request(url, {json: true}, function (error, response, body) {
-        
-        if (body.error) {
-          rej(body.error.message)
-          
-        } else {
-          res(body.items)
-        }
-        
-      })
-    })
-  }
-  
-  fetchGoogle(url)
-      .then((result) => {
-        res.json(result)
-      })
-      .catch((err) => {
-        let message = `<p>Error in Google search</p><p>${err}</p>`
-        emailError.send(message)
-            .catch((err) => console.log("error", err))
-        res.send(err)
-      })
-}))
-
-// ===== FLICKR IMAGE SEARCH ==================================================
-
-app.get('/flickrSearch', ((req, res) => {
-  
-  flickrSearch.search({})
-      .then((result) => {
-        console.log("result = ", result)
-        res.send(result)
-      })
-}))
-
-// +++++++++++=  TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-// ToDo
-
-// app.get('/test2', function(req, res){
-//   var options = {
-//     root: path.join(__dirname, '/images/client/')
-//   };
-//
-//   var fileName = 'chico.txt';
-//   res.sendFile(fileName, options, function (err) {
-//     if (err) {
-//       next(err);
-//     } else {
-//       console.log('Sent:', fileName);
-//     }
-//   });
-// });
-
-// +++++++++++=  END TEST PATH ++++++++++++++++++++++++++++++++++++++++++++++++
+/**
+ * This route serves a server image file
+ * Query format:  http://host/image?image=filename.jpg
+ * Filename query argument must include path, i.e., /images/client/general/
+ */
 
 app.get('/image', (req, res) => {
   let image = req.query.image
@@ -198,18 +114,18 @@ app.get('/image', (req, res) => {
 })
 
 app.get('/', ((req, res) => {
-  let message = "Message from CS361"
+  let message = "API message:  call for images using route /getImage"
   message = JSON.stringify(message)
   res.send(message)
 }));
 
+// Error handling
 
 app.use(function(req,res){
   res.type('text/plain');
   res.status(404);
   res.send('404 - Not Found');
 });
-
 
 app.use(function(err, req, res, next){
   console.error(err.stack);

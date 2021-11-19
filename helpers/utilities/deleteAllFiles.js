@@ -4,7 +4,7 @@
 const emailError = require('../utilities/emailError');
 const fs = require('fs');
 
-deleteAll = function(dirPath) {
+deleteAll = function(dirPath, clearingImageFile) {
   try {
     let files = fs.readdirSync(dirPath);
     if (files.length > 0) {
@@ -15,7 +15,9 @@ deleteAll = function(dirPath) {
         }
       }
     }
+    clearingImageFile.status = false;
   } catch (e) {
+    clearingImageFile.status = false;
     let message = `<p>Error while trying to delete all files in ${dirPath}</p><p>${e}</p>`;
     emailError.send(message).then((message) => console.log(`Error while trying to delete all files in ${dirPath} - ${e}`));
   }

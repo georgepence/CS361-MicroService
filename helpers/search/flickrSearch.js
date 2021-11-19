@@ -1,6 +1,4 @@
 let request = require('request');
-// let parseString = require('xml2js').parseString;         // TODO
-// let userId = 'user_id=32758310%40N04'                    // TODO
 require('dotenv').config();
 
 let apiKey = 'api_key=' + process.env.FLICKR_KEY;

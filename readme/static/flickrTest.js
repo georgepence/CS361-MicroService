@@ -66,7 +66,7 @@ async function fetchLinks() {
   }
   
   // ==========  END OF SEARCH   ==============================================
-  // Todo
+
   imageDiv.innerHTML = htmlCode
   
 }

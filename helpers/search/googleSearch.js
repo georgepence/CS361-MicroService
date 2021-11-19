@@ -11,13 +11,12 @@ async function googleSearch(clientReq) {
   let url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}`
   url += `&q=${searchTerms}&imgSize=${imgSize}&start=${start}&fileType=jpg&searchType=image`
   
-  // Function that returns a Promise which resolves to Google search results.
+  // Returns a Promise which resolves to Google search results.
   // Search results are limited to 10 images.
-  // function fetchGoogle(url) {
   
   return new Promise((res, rej) => {
     request(url, {json: true}, function (error, response, body) {
-      // console.log("body = ", body, body.error, typeof body, typeof body.error)   // TODO
+      
       if (body.error) {
         res(body)
   
@@ -26,9 +25,9 @@ async function googleSearch(clientReq) {
         
       } else {
         
-        for (let i = 0; i < body.items.length; i++) {
-          console.log(body.items[i].link)
-        }
+        // for (let i = 0; i < body.items.length; i++) {
+        //   console.log(body.items[i].link)
+        // }        // TODO
 
         let sourceUrl = findRandomImage(body.items);
         

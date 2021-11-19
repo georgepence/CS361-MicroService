@@ -112,7 +112,7 @@ async function fetchImage(source) {
   }
   
   // ==========  END OF SEARCH   ==============================================
-                          // Todo
+
   imageDiv.innerHTML = htmlCode
   
 }

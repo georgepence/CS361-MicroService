@@ -1,3 +1,33 @@
+###### Information for Code Review
+
+# Roadmap / Directory Structure
+
+When Queries come in, the most important parameter is 'response_type'.  
+
+Image Server ('Server')
+will go in one of two directions, based on this parameter.  **If response_type=random**,
+Server will ignore all other parameters, do a random Flickr search, and return an outside (flickr)
+image link as text json.  
+
+**All other response_types** (link, or file) are assumed to be 
+keyword searches, and Server will do a search, download a random result of those search results,
+process the image if needed, and send back the image from Server's disk (not the original
+source link).  This will be a json text of the link to the server, or the file itself, using sendFile.
+
+### Files
+- **server.js**: Only two routes matter:
+  - /getImage parses the client request, and calls the getImage function (note that getImage is imported as 'helpers')
+  - /image is a way for a client to access an image on Server's hard disk (/image?image=filename.jpg)
+
+- **helpers/getImage.js** does a lot of heavy lifting.  The process is to select a search engine, search, process the
+returned image, and return an object with the information needed for server.js to send the 
+appropriate response to the client.  **getImage** calls on some helpers:
+  - /imageProcessing/**download**.js to download an image from a source link
+  - /search/**setSearchEngine** to select the search engine and to give getImage access to /search/flickrSearch or /search/googleSearch (through the engine variable)
+
+---
+---
+###### Information for Image Server Clients
 # Image Server
 
 ---

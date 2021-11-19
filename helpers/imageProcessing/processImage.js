@@ -7,7 +7,6 @@ async function getMetadata(image) {
   return new Promise((res, rej) => {
     sharp(image).metadata()
         .then((result) => {
-          console.log("In metadata, result = ", result)
           res(result)
         })
         .catch((e) => {

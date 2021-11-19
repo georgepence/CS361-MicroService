@@ -11,7 +11,7 @@ async function addUrls(cacheStatus, cacheSize) {
   while (needToAdd) {
     
     let url = await getRandomUrl()
-        .catch(err => {console.log(err)});
+        .catch(err => {console.log("Error in addUrls", err)});
     
     await queryDb(
         'insert into RandomUrls (`url`) values (?)',

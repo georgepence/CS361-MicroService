@@ -18,7 +18,14 @@ async function getRandomUrl() {
     
     let photo = photos.photo[Math.floor(Math.random() * photos.photo.length)];
     
-    return `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`
+    let data
+    try {
+      data = `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`
+    } catch {
+      console.log(photo)
+      data = {error: true, message: photo}
+    }
+    return data
   }
 }
 
