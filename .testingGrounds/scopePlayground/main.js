@@ -22,3 +22,23 @@ try {
 }
 
 console.log("status = ", status)
+
+let muffy = new Date()
+let tuffy = new Date(new Date().getTime() - (2 * 24 * 60 * 60 * 1000))
+googleStatus = {  }
+
+if (muffy - googleStatus.quotaReached > 200) {
+  console.log("I'm here")
+} else {
+  console.log("I'm there")
+}
+
+let doggie = new Date()
+console.log(doggie.getDate())
+if (new Date - googleStatus.timeReached > 1 ) {
+  console.log(myPet)
+}
+
+if (new Date - doggie < 1 ) {
+  console.log("What is happening")
+}
