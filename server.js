@@ -1,16 +1,17 @@
 const express = require('express');
-const request = require('request');
-const cors = require('cors');
-require('dotenv').config();
+// const request = require('request');                              todo
 const bodyParser = require('body-parser');
 const helpers = require('./helpers/getImage');
 const updateCache = require('./helpers/updateCache');
 const logFile = require('./helpers/utilities/logFile');
 const clearImageFiles = require('./helpers/utilities/deleteAllFiles');
-const pause = require('./helpers/utilities/pause');
+// const pause = require('./helpers/utilities/pause');                todo
 const emailError = require('./helpers/utilities/emailError');
-const googleSearch = require('./helpers/search/googleSearch');
-const flickrSearch = require('./helpers/search/flickrSearch')
+// const googleSearch = require('./helpers/search/googleSearch');     todo
+// const flickrSearch = require('./helpers/search/flickrSearch');     todo
+
+const cors = require('cors');
+require('dotenv').config();
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -26,7 +27,6 @@ const cacheStatus = {
   desiredCacheSize: parseInt(process.env.CACHE_SIZE) || 100,
   unfinishedGets: 0
 }
-
 const clearingImageFile = { status: true };
 const googleStatus = { quotaLimitReached: false };
 

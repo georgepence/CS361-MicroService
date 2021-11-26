@@ -25,6 +25,8 @@ async function emailError(message) {
         pass: process.env.MAIL_PW // generated ethereal password
       },
     });
+
+    console.log("Email Good so far")
   
     // send mail with defined transport object
     let info = await transporter.sendMail({
@@ -33,7 +35,7 @@ async function emailError(message) {
       subject: "Error Message", // Subject line
       text: "A nuclear explosion happened today", // plain text body
       html: `<b>${message}</b>`, // html body
-    });
+    }).catch(err => console.log("Error sending message ha: ", err));
   
     console.log("Message sent: %s", info.messageId);
     // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
