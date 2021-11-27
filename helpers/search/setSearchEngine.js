@@ -11,7 +11,7 @@ function setSearchEngine(clientReq, googleStatus) {
 
    return cacheSearch;
    
-  }  else if(googleStatus.quotaLimitReached) {
+  }  else if(googleStatus.quotaLimitReached || googleStatus.failedSearch) {
     return flickrSearch;
     
   } else {

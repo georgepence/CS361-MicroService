@@ -28,7 +28,10 @@ const cacheStatus = {
   unfinishedGets: 0
 }
 const clearingImageFile = { status: true };
-const googleStatus = { quotaLimitReached: false };
+const googleStatus = {
+  failedSearch: false,
+  quotaLimitReached: false
+};
 
 clearImageFiles('./images/client/general', clearingImageFile);
 updateCache.fillCache(cacheStatus).then(() => {});
@@ -51,10 +54,35 @@ app.get('/getImage', ((req, res) => {
     
     // Error
     if (image.error) {
-      res.send(image.error === true);
-      emailError.send(`<p>Error getting image url</p><p>${image.error}</p>`)
-          .catch((err) => console.log("error", err))
-      
+      googleStatus.failedSearch = true;
+      image = await helpers.getImage(req.query, cacheStatus, googleStatus);
+
+      if (image.error) {
+        res.send(image.error === true);
+        emailError.send(`<p>Error getting image url</p><p>${image.error}</p>`)
+            .catch((err) => console.log("error", err))
+      } else {
+        // Send link or file, based on client url request query arguments
+
+        // Send link to processed image on server (keyword search, response_type=link)
+        if (req.query.response_type === "link") {
+          res.json(image.host + '/image?image=' + image.filePath + image.fileName)
+
+          // Send link to original image from external site (response_type=random)
+        } else if (req.query.response_type === "random") {
+          res.json(image.sourceUrl);
+
+          // Send image file from server (keyword search, response_type=file)
+        } else {
+          try {
+            res.sendFile(`${__dirname}${image.filePath}${image.fileName}`)
+          } catch (error) {
+            emailError.send(`<p>Error with sendFile in server</p><p>${error}</p>`)
+                .catch((err) => console.log("error", err))
+          }
+        }
+      }
+
     } else {
       // Send link or file, based on client url request query arguments
       
