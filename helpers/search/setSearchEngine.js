@@ -8,15 +8,13 @@ function setSearchEngine(clientReq, googleStatus) {
   if ((clientReq.response_type === 'random') &&
       !clientReq.width &&
       !clientReq.height) {
-    console.log("Engine = cacheSearch")   // todo
     return cacheSearch;
 
   } else if (googleStatus.quotaLimitReached || googleStatus.failedSearch) {
-    console.log("Engine = flickrSearch")   // todo
+    googleStatus.failedSearch = false;
     return flickrSearch;
 
   } else {
-    console.log("Engine = googleSearch")   // todo
     return googleSearch;
   }
 
