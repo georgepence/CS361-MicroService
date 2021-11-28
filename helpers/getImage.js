@@ -84,9 +84,7 @@ async function getImage(clientReq, cacheStatus, googleStatus) {
           return result
               })
           .catch((e) => {
-          let message = `<p>Error processing file ${imageFile}</p><p>${e}</p>`;
-          emailError.send(message)
-              .then(() => console.log(`Error processing file ${imageFile} - ${e}`));
+          console.log(`(getImage) Error processing file ${imageFile} - ${e}`);
         })
   
   

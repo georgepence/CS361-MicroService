@@ -30,7 +30,7 @@ async function download(url, dest, imageFile) {
             reject(error);
           })
     } catch (error) {
-      console.log(`Error processing file in download.js: ${url}`)
+      console.log(`(Download) Error processing file: ${url}`)
     }
 
   })
