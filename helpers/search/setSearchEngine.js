@@ -4,18 +4,20 @@ const cacheSearch = require('./cacheSearch');
 const e = require("express");
 
 function setSearchEngine(clientReq, googleStatus) {
- 
+
   if ((clientReq.response_type === 'random') &&
       !clientReq.width &&
       !clientReq.height) {
+    console.log("Engine = cacheSearch")   // todo
+    return cacheSearch;
 
-   return cacheSearch;
-   
-  }  else if(googleStatus.quotaLimitReached || googleStatus.failedSearch) {
+  } else if (googleStatus.quotaLimitReached || googleStatus.failedSearch) {
+    console.log("Engine = flickrSearch")   // todo
     return flickrSearch;
-    
+
   } else {
-    return  googleSearch;
+    console.log("Engine = googleSearch")   // todo
+    return googleSearch;
   }
 
 }

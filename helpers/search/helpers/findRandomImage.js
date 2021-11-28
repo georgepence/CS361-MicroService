@@ -26,6 +26,7 @@ async function findRandomImage(results) {
   
   }
   if (foundImage) {
+    console.log(`idx = ${idx}`)
     return sourceUrl;
     
   } else {
