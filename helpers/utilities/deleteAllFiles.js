@@ -1,7 +1,6 @@
 // adapted from
 // www.codegrepper.com/code-examples/javascript/nodejs+delete+files+in+directory
 
-const emailError = require('../utilities/emailError');
 const fs = require('fs');
 
 deleteAll = function(dirPath, clearingImageFile) {
@@ -18,8 +17,7 @@ deleteAll = function(dirPath, clearingImageFile) {
     clearingImageFile.status = false;
   } catch (e) {
     clearingImageFile.status = false;
-    let message = `<p>Error while trying to delete all files in ${dirPath}</p><p>${e}</p>`;
-    emailError.send(message).then((message) => console.log(`Error while trying to delete all files in ${dirPath} - ${e}`));
+    console.log(`Error while trying to delete all files in ${dirPath} - ${e}`);
   }
 }
 

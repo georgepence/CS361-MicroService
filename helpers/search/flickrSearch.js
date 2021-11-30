@@ -17,27 +17,29 @@ async function search(args) {
     
     method = 'method=flickr.photos.search'
     url += `${method}&${apiKey}&tags=${args.searchTerms}&${page}&format=json&nojsoncallback=1`
-    console.log(url)
     
   } else {
     // ======= --->>>>   OBTAIN IMAGE URL FROM RANDOM SEARCH    <<<<--- =======
     
     method  = 'method=flickr.groups.pools.getPhotos'
     url += `${method}&${apiKey}&${groupId}&${page}format=json&nojsoncallback=1`
-    console.log(url)
   }
 
   // Function that returns a Promise which resolves to JSON search results.
   
   return new Promise((res, rej) => {
+  
+    console.log(`At flickrSearch top: ${JSON.stringify(args)}`)
     request(url, {json: true}, function (error, response, body) {
-
-      if (!body.photos) {
-        console.log("error")
-        rej(body);
+      
+      if (error) {
+        console.log(`flickrSearch error: error= \n ${error}`)
+        res({ error: body });
       }
-      if (body.photos.photo.length === 0) {
-        console.log(body)
+      
+      if (!body.photos || body.photos.photo.length === 0) {
+        console.log(`flickrSearch error: !body.photos, body= \n ${body}`)
+        res({ error: body });
       }
       
       if (args.searchTerms && !(args.response_type === 'random')) {

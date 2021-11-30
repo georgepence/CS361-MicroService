@@ -1,7 +1,6 @@
 const flickrSearch = require('./flickrSearch');
 const googleSearch = require('./googleSearch');
 const cacheSearch = require('./cacheSearch');
-const e = require("express");
 
 function setSearchEngine(clientReq, googleStatus) {
 

@@ -15,20 +15,22 @@ async function googleSearch(clientReq) {
   // Search results are limited to 10 images.
   
   return new Promise((res, rej) => {
+    console.log(`At googleSearch top: ${JSON.stringify(clientReq)}`)
     request(url, {json: true}, function (error, response, body) {
+  
+      if (error) {
+        console.log(`googleSearch error: error= \n ${error}`)
+        res({ error: body });
+      }
       
       if (body.error) {
-        res(body)
+        console.log(`googleSearch error: error= \n ${body.error}`)
+        res({ error: body.error });
   
       } else if (body.items.length === 0) {
-        res({ error: "The search returned no results. Try a different search." })
+        res({ error: `The search returned no results. Try a different search. ${body}` })
         
       } else {
-        
-        // for (let i = 0; i < body.items.length; i++) {
-        //   console.log(body.items[i].link)
-        // }        // TODO
-
         let sourceUrl = findRandomImage(body.items);
         
         res(sourceUrl);

@@ -1,14 +1,9 @@
 const express = require('express');
-// const request = require('request');                              todo
 const bodyParser = require('body-parser');
 const helpers = require('./helpers/getImage');
 const updateCache = require('./helpers/updateCache');
 const logFile = require('./helpers/utilities/logFile');
 const clearImageFiles = require('./helpers/utilities/deleteAllFiles');
-// const pause = require('./helpers/utilities/pause');                todo
-const emailError = require('./helpers/utilities/emailError');
-// const googleSearch = require('./helpers/search/googleSearch');     todo
-// const flickrSearch = require('./helpers/search/flickrSearch');     todo
 
 const cors = require('cors');
 require('dotenv').config();
@@ -42,25 +37,24 @@ updateCache.fillCache(cacheStatus).then(() => {});
 app.get('/getImage', ((req, res) => {
 
   async function fetchImage(req) {
-
-    // TODO:  This needs to be handled differently
+    
     if (!(req.query.response_type === 'random') && !req.query.searchTerms) {
       req.query.response_type = 'random'
     }
     
     // Get location of image to send client
     let image = await helpers.getImage(req.query, cacheStatus, googleStatus);
-    console.log("server.js says I got imageInfo --> ", image);       //  TODO
     
-    // Error
+    // If error: re-do search as flickr search
     if (image.error) {
       googleStatus.failedSearch = true;
       image = await helpers.getImage(req.query, cacheStatus, googleStatus);
 
+      // If still error, send error message back to client
       if (image.error) {
-        res.send(image.error === true);
-        emailError.send(`<p>Error getting image url</p><p>${image.error}</p>`)
-            .catch((err) => console.log("error", err))
+        res.send(image);
+        console.log("error", image)
+        
       } else {
         // Send link or file, based on client url request query arguments
 
@@ -77,8 +71,7 @@ app.get('/getImage', ((req, res) => {
           try {
             res.sendFile(`${__dirname}${image.filePath}${image.fileName}`)
           } catch (error) {
-            emailError.send(`<p>Error with sendFile in server</p><p>${error}</p>`)
-                .catch((err) => console.log("error", err))
+            console.log("error", error)
           }
         }
       }
@@ -99,8 +92,7 @@ app.get('/getImage', ((req, res) => {
         try {
           res.sendFile(`${__dirname}${image.filePath}${image.fileName}`)
         } catch (error) {
-          emailError.send(`<p>Error with sendFile in server</p><p>${error}</p>`)
-              .catch((err) => console.log("error", err))
+          console.log("error", error)
         }
       }
     }
@@ -113,27 +105,10 @@ app.get('/getImage', ((req, res) => {
 
 }))
 
-// =================  TESTING CACHE OPERATIONS  ===============================
 
-// app.get('/cache', ((req, res) => {
-//
-//   updateCache.fillCache().then((result) => res.json(result) )
-//
-// }))
-
-// // TODO
-// app.get('/updateCache', ((req, res) => {
-//
-//   updateCache.Update().then((result) => res.json(result) )
-//
-// }))
-
-
-/**
- * This route serves a server image file
- * Query format:  http://host/image?image=filename.jpg
- * Filename query argument must include path, i.e., /images/client/general/
- */
+// This route serves a server image file
+// Query format:  http://host/image?image=filename.jpg
+// Filename query argument must include path, i.e., /images/client/general/
 
 app.get('/image', (req, res) => {
   let image = req.query.image
@@ -141,11 +116,14 @@ app.get('/image', (req, res) => {
   res.sendFile(__dirname + image)
 })
 
+
+// Message on simple GET request with no parameters
 app.get('/', ((req, res) => {
   let message = "API message:  call for images using route /getImage"
   message = JSON.stringify(message)
   res.send(message)
 }));
+
 
 // Error handling
 
@@ -162,4 +140,6 @@ app.use(function(err, req, res, next){
   res.send('500 - Image Server Error');
 });
 
+
+// Listen
 app.listen(port, ()=> console.log(`server started on port ${port}.`));

@@ -1,6 +1,6 @@
 const deleteUrl = require('./deleteUrl');
 
-// Delete a urls from RandomUrls table
+// Delete urls from RandomUrls table
 
 async function deleteUrls(cacheStatus, cacheSize) {
   

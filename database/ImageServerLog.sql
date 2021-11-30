@@ -1,3 +1,4 @@
+-- BELOW CODE ADAPTED FROM www.phpmyadmin.net
 -- phpMyAdmin SQL Dump
 -- version 5.1.1-1.el7.remi
 -- https://www.phpmyadmin.net/
