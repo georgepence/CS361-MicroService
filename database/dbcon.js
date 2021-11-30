@@ -17,7 +17,7 @@ function promisePool(query, vars){
 
     pool.query(query, vars, (err, rows, fields) => {
       if (err){
-        console.log("Here in dbcon error:  rej = ", err);       // TODO
+        console.log("Here in dbcon error:  rej = ", err);
         rej(err);
         
       } else {

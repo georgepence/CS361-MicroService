@@ -81,13 +81,25 @@ integer
 
 <tr>
 <td style="font-family: 'Andale Mono',monospace">
-response_type
+height=
 </td>
 <td style="font-family: 'Andale Mono',monospace">
 desired height in pixels
 </td>
 <td style="font-family: 'Andale Mono',monospace">
 integer
+</td>
+</tr>
+
+<tr>
+<td style="font-family: 'Andale Mono',monospace">
+searchTerms=
+</td>
+<td style="font-family: 'Andale Mono',monospace">
+search terms (separate multiple terms by '+')
+</td>
+<td style="font-family: 'Andale Mono',monospace">
+text
 </td>
 </tr>
 
@@ -122,8 +134,8 @@ This will be an outside link (not on Image Server).
 Image Server may implement backup search methods (in case of failure), but this 
 is not implemented at this
 time.  
-- If response_type is 'random', any other arguments (such as height or width)
-will be ignored.
+- *If response_type is 'random', any other arguments (such as height or width)
+will be ignored.*
 - Image links will be to jpeg images, extension .jpg
 - Images will be approximately 1024 px on their longest dimension (height or width)
 
